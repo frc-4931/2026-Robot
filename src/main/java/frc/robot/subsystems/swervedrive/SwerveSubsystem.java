@@ -6,6 +6,7 @@ package frc.robot.subsystems.swervedrive;
 
 import static edu.wpi.first.units.Units.Meter;
 
+import com.ctre.phoenix.sensors.PigeonIMU;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.commands.PathfindingCommand;
@@ -17,6 +18,8 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
+
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -32,7 +35,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
-import frc.robot.subsystems.swervedrive.Vision.Cameras;
+import frc.robot.Constants.VisionOdometry;
+import frc.robot.LimelightHelpers;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -58,16 +62,11 @@ public class SwerveSubsystem extends SubsystemBase
    * Swerve drive object.
    */
   private final SwerveDrive swerveDrive;
-  
-  /**
-   * Enable vision odometry updates while driving.
+
+   /**
+   * PigeonIMU object.
    */
-  private final boolean     visionDriveTest = false;
- 
-  /**
-   * PhotonVision class to keep an accurate odometry.
-   */
-  private       Vision      vision;
+  private PigeonIMU pigeon;
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -102,11 +101,11 @@ public class SwerveSubsystem extends SubsystemBase
     swerveDrive.setModuleEncoderAutoSynchronize(false,
                                                 1); // Enable if you want to resynchronize your absolute encoders and motor encoders periodically when they are not moving.
     // swerveDrive.pushOffsetsToEncoders(); // Set the absolute encoder to be used over the internal encoder and push the offsets onto it. Throws warning if not possible
-    if (visionDriveTest)
+    if (VisionOdometry.VisionDrive)
     {
-      setupPhotonVision();
       // Stop the odometry thread if we are using vision that way we can synchronize updates better.
       swerveDrive.stopOdometryThread();
+      PigeonIMU pigeon = (PigeonIMU)swerveDrive.getGyro().getIMU();
     }
     setupPathPlanner();
   }
@@ -126,23 +125,47 @@ public class SwerveSubsystem extends SubsystemBase
                                              Rotation2d.fromDegrees(0)));
   }
 
-  /**
-   * Setup the photon vision class.
-   */
-  public void setupPhotonVision()
-  {
-    vision = new Vision(swerveDrive::getPose, swerveDrive.field);
-  }
-
   @Override
   public void periodic()
   {
     // When vision is enabled we must manually update odometry in SwerveDrive
-    if (visionDriveTest)
+    if (VisionOdometry.VisionDrive)
     {
       swerveDrive.updateOdometry();
-      vision.updatePoseEstimation(swerveDrive);
+      updateVisionOdometry();
     }
+  }
+
+   /**
+   * Limelight MegaTag Pose Estimation
+   */
+  public void updateVisionOdometry(){
+    if (VisionOdometry.MegaTag2){ // Limelight MegaTag2 Pose Estimation
+
+        // First, tell Limelight your robot's current orientation
+        double robotYaw = pigeon.getYaw(); // Needs to be robot yaw in degrees. 0 = robot facing red alliance wall in FRC
+        LimelightHelpers.SetRobotOrientation("limelight", robotYaw, 0.0, 0.0, 0.0, 0.0, 0.0);
+
+        // Get the pose estimate
+        LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+
+        // Add it to your pose estimator
+        swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(.5, .5, 9999999));
+        swerveDrive.addVisionMeasurement(
+            limelightMeasurement.pose,
+            limelightMeasurement.timestampSeconds
+        );
+    }
+    else { // Limelight MegaTag Pose Estimation
+
+        // Get the pose estimate
+        LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
+
+        // Add it to your pose estimator
+        if(limelightMeasurement.tagCount >= 2){  // Only trust measurement if we see multiple tags
+        swerveDrive.addVisionMeasurement(limelightMeasurement.pose, limelightMeasurement.timestampSeconds, VecBuilder.fill(.7,.7,9999999));
+        }
+    }   
   }
 
   @Override
@@ -226,24 +249,24 @@ public class SwerveSubsystem extends SubsystemBase
    *
    * @return A {@link Command} which will run the alignment.
    */
-  public Command aimAtTarget(Cameras camera)
-  {
+  // public Command aimAtTarget(Cameras camera)
+  // {
 
-    return run(() -> {
-      Optional<PhotonPipelineResult> resultO = camera.getBestResult();
-      if (resultO.isPresent())
-      {
-        var result = resultO.get();
-        if (result.hasTargets())
-        {
-          drive(getTargetSpeeds(0,
-                                0,
-                                Rotation2d.fromDegrees(result.getBestTarget()
-                                                             .getYaw()))); // Not sure if this will work, more math may be required.
-        }
-      }
-    });
-  }
+  //   return run(() -> {
+  //     Optional<PhotonPipelineResult> resultO = camera.getBestResult();
+  //     if (resultO.isPresent())
+  //     {
+  //       var result = resultO.get();
+  //       if (result.hasTargets())
+  //       {
+  //         drive(getTargetSpeeds(0,
+  //                               0,
+  //                               Rotation2d.fromDegrees(result.getBestTarget()
+  //                                                            .getYaw()))); // Not sure if this will work, more math may be required.
+  //       }
+  //     }
+  //   });
+  // }
 
   /**
    * Get the path follower with events.
