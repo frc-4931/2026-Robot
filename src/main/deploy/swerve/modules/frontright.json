@@ -6,7 +6,7 @@
   "absoluteEncoderOffset": 77,
   "drive": {
     "type": "sparkflex_vortex",
-    "id": 12,
+    "id": 2,
     "canbus": null
   },
   "angle": {
