@@ -26,8 +26,8 @@ public final class Constants
   public static final double MAX_SPEED  = Units.feetToMeters(14.5);
   
   // Maximum drive speed of the robot in meters per second.
-  public static final double speedMultiplier = 0.65;
-  public static final double rotationMultiplier = 0.65;
+  public static final double speedMultiplier = 0.15;
+  public static final double rotationMultiplier = 0.15;
   
 //  public static final class AutonConstants
 //  {
