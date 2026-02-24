@@ -67,6 +67,13 @@ public class SwerveSubsystem extends SubsystemBase
    * PigeonIMU object.
    */
   private PigeonIMU pigeon;
+  private Translation2d currentAccelVector = new Translation2d();
+
+  /**
+   * Used for YAGSL accelation 
+   */
+  private ChassisSpeeds previousVelocity = new ChassisSpeeds();
+  private final double loopPeriod_s = 0.02; // Standard 20ms FRC loop
 
   /**
    * Initialize {@link SwerveDrive} with the directory provided.
@@ -136,6 +143,14 @@ public class SwerveSubsystem extends SubsystemBase
       swerveDrive.updateOdometry();
       updateVisionOdometry();
     }
+    short[] xyz_raw = new short[3];
+    pigeon.getBiasedAccelerometer(xyz_raw); 
+
+    // Conversion: Pigeon 1.0 scale is 16384 bits per 1G
+    double accelX = (xyz_raw[0] / 16384.0) * 9.81;
+    double accelY = (xyz_raw[1] / 16384.0) * 9.81;
+
+    currentAccelVector = new Translation2d(accelX, accelY);
   }
 
    /**
@@ -751,5 +766,27 @@ public class SwerveSubsystem extends SubsystemBase
   public SwerveDrive getSwerveDrive()
   {
     return swerveDrive;
+  }
+
+  public Translation2d getGyroAcceleration() {
+        return currentAccelVector;
+  }
+
+  /**
+   * Calculates the acceleration of the robot using the change in velocity over time. 
+   * This is a simple numerical differentiation method and may be noisy, 
+   * but can be useful for certain applications.
+   * @return A Translation2d representing the acceleration in the X and Y directions (in meters per second squared).
+   */
+  public Translation2d getYAGSLAcceleration() {
+    ChassisSpeeds currentVelocity = swerveDrive.getRobotVelocity();
+
+    // Calculate acceleration: (V_now - V_prev) / dt
+    double ax = (currentVelocity.vxMetersPerSecond - previousVelocity.vxMetersPerSecond) / loopPeriod_s;
+    double ay = (currentVelocity.vyMetersPerSecond - previousVelocity.vyMetersPerSecond) / loopPeriod_s;
+    // Update for next loop
+    previousVelocity = currentVelocity;
+
+    return new Translation2d(ax, ay);    
   }
 }
