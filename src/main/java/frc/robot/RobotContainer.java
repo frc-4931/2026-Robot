@@ -21,10 +21,13 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
+
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -33,6 +36,7 @@ import swervelib.SwerveInputStream;
  */
 public class RobotContainer
 {
+   private final ShooterSubsystem twoshootermotor = new ShooterSubsystem();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final         CommandXboxController driverXbox = new CommandXboxController(0);
@@ -193,6 +197,24 @@ public class RobotContainer
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       driverXbox.rightBumper().onTrue(Commands.none());
+      // driverXbox.rightTrigger().whileTrue(new FixedSpeedShot(twoshootermotor,6000.0));
+      // These will only execute if the Robot is physically put into "Test Mode"
+      driverXbox.povUp().whileTrue(
+          twoshootermotor.sysIdQuasistatic(Direction.kForward)
+          .onlyIf(DriverStation::isTest)
+      );
+      driverXbox.povDown().whileTrue(
+          twoshootermotor.sysIdQuasistatic(Direction.kReverse)
+          .onlyIf(DriverStation::isTest)
+      );
+      driverXbox.povRight().whileTrue(
+          twoshootermotor.sysIdDynamic(Direction.kForward)
+          .onlyIf(DriverStation::isTest)
+      );
+      driverXbox.povLeft().whileTrue(
+          twoshootermotor.sysIdDynamic(Direction.kReverse)
+          .onlyIf(DriverStation::isTest)
+      );
     }
 
   }

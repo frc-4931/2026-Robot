@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -156,8 +157,17 @@ public class Robot extends TimedRobot
   {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
+    DataLogManager.start(); 
+    System.out.println("Logging started for Test Mode.");
   }
-
+  
+  @Override
+  public void testExit() {
+    // Stop logging when exiting Test Mode to save space/resources
+    DataLogManager.stop();
+    System.out.println("Logging stopped.");
+  }
+  
   /**
    * This function is called periodically during test mode.
    */

@@ -57,4 +57,12 @@ public final class Constants
     public static final boolean VisionDrive = false;
     public static final boolean MegaTag2 = false;
   }
+
+  public static class ShooterSubsystem{
+    public static final int LEADER_ID = 10;
+    public static final int FOLLOWER_ID = 11;
+    public static final int ROLLER_MOTOR_CURRENT_LIMIT = 60;
+    public static final double ROLLER_MOTOR_VOLTAGE_COMP = 10;
+    public static final double PRACTICE_MOTOR_SPIN = -.5;
+  }
 }
