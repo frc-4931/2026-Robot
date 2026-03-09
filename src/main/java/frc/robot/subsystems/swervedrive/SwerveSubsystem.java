@@ -18,18 +18,25 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
+import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -63,6 +70,11 @@ public class SwerveSubsystem extends SubsystemBase
    */
   private final SwerveDrive swerveDrive;
 
+  private SwerveDrivePoseEstimator poseEstimator;
+  private SwerveDriveKinematics kinematics;
+  private static final double TRACK_WIDTH_X = Units.inchesToMeters(27.0);
+  private static final double TRACK_WIDTH_Y = Units.inchesToMeters(27.0);
+
    /**
    * PigeonIMU object.
    */
@@ -83,12 +95,21 @@ public class SwerveSubsystem extends SubsystemBase
    public SwerveSubsystem(File directory)
   { 
     boolean blueAlliance = false;
+
+    Translation2d[] moduleLocations = new Translation2d[] {
+        new Translation2d(TRACK_WIDTH_X / 2, TRACK_WIDTH_Y / 2),
+        new Translation2d(TRACK_WIDTH_X / 2, -TRACK_WIDTH_Y / 2),
+        new Translation2d(-TRACK_WIDTH_X / 2, TRACK_WIDTH_Y / 2),
+        new Translation2d(-TRACK_WIDTH_X / 2, -TRACK_WIDTH_Y / 2)
+    };
+
     Pose2d startingPose = blueAlliance ? new Pose2d(new Translation2d(Meter.of(1),
                                                                       Meter.of(4)),
                                                     Rotation2d.fromDegrees(0))
                                        : new Pose2d(new Translation2d(Meter.of(16),
                                                                       Meter.of(4)),
                                                     Rotation2d.fromDegrees(180));
+    kinematics = new SwerveDriveKinematics(moduleLocations);                                            
     // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary objects being created.
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     try
@@ -102,6 +123,16 @@ public class SwerveSubsystem extends SubsystemBase
     {
       throw new RuntimeException(e);
     }
+
+    // Ensure we have a reference to the IMU for things like accelerometer reads
+    pigeon = (PigeonIMU) swerveDrive.getGyro().getIMU();
+
+    // Initialize the pose estimator once the drive is constructed and module state information is available.
+    poseEstimator = new SwerveDrivePoseEstimator(kinematics,
+                                                 getGyroRotation2d(),
+                                                 getModulePositions(),
+                                                 new Pose2d());
+
     swerveDrive.setHeadingCorrection(false); // Heading correction should only be used while controlling the robot via angle.
     swerveDrive.setCosineCompensator(false);//!SwerveDriveTelemetry.isSimulation); // Disables cosine compensation for simulations since it causes discrepancies not seen in real life.
     swerveDrive.setAngularVelocityCompensation(true,
@@ -132,19 +163,30 @@ public class SwerveSubsystem extends SubsystemBase
                                   Constants.MAX_SPEED,
                                   new Pose2d(new Translation2d(Meter.of(2), Meter.of(0)),
                                              Rotation2d.fromDegrees(0)));
+
+    kinematics = swerveDrive.kinematics;
+
+    pigeon = (PigeonIMU) swerveDrive.getGyro().getIMU();
+    poseEstimator = new SwerveDrivePoseEstimator(kinematics,
+                                                 getGyroRotation2d(),
+                                                 getModulePositions(),
+                                                 swerveDrive.getPose());
   }
 
   @Override
   public void periodic()
   {
-    // When vision is enabled we must manually update odometry in SwerveDrive
+    // Update the internal pose estimator from gyro + module odometry (wheel travel)
+    poseEstimator.update(getGyroRotation2d(), getModulePositions());
+
+    // When vision is enabled, also incorporate Limelight pose estimates for smooth fusion.
     if (VisionOdometry.VisionDrive)
     {
-      swerveDrive.updateOdometry();
       updateVisionOdometry();
     }
+
     short[] xyz_raw = new short[3];
-    pigeon.getBiasedAccelerometer(xyz_raw); 
+    pigeon.getBiasedAccelerometer(xyz_raw);
 
     // Conversion: Pigeon 1.0 scale is 16384 bits per 1G
     double accelX = (xyz_raw[0] / 16384.0) * 9.81;
@@ -167,8 +209,8 @@ public class SwerveSubsystem extends SubsystemBase
         LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
 
         // Add it to your pose estimator
-        swerveDrive.setVisionMeasurementStdDevs(VecBuilder.fill(.5, .5, 9999999));
-        swerveDrive.addVisionMeasurement(
+        poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.5, .5, 9999999));
+        poseEstimator.addVisionMeasurement(
             limelightMeasurement.pose,
             limelightMeasurement.timestampSeconds
         );
@@ -179,10 +221,11 @@ public class SwerveSubsystem extends SubsystemBase
         LimelightHelpers.PoseEstimate limelightMeasurement = LimelightHelpers.getBotPoseEstimate_wpiBlue("limelight");
 
         // Add it to your pose estimator
-        if(limelightMeasurement.tagCount >= 2){  // Only trust measurement if we see multiple tags
-        swerveDrive.addVisionMeasurement(limelightMeasurement.pose, limelightMeasurement.timestampSeconds, VecBuilder.fill(.7,.7,9999999));
+        if (limelightMeasurement.tagCount >= 2) // Only trust measurement if we see multiple tags
+        {
+          poseEstimator.addVisionMeasurement(limelightMeasurement.pose, limelightMeasurement.timestampSeconds);
         }
-    }   
+    }
   }
 
   @Override
@@ -560,7 +603,9 @@ public class SwerveSubsystem extends SubsystemBase
    */
   public void resetOdometry(Pose2d initialHolonomicPose)
   {
+    // Keep both the underlying drive (which may be used by other libraries) and our estimator in sync.
     swerveDrive.resetOdometry(initialHolonomicPose);
+    poseEstimator.resetPosition(getGyroRotation2d(), getModulePositions(), initialHolonomicPose);
   }
 
   /**
@@ -570,11 +615,28 @@ public class SwerveSubsystem extends SubsystemBase
    */
   public Pose2d getPose()
   {
-    return swerveDrive.getPose();
+    return poseEstimator.getEstimatedPosition();
   }
 
   /**
-   * Set chassis speeds with closed-loop velocity control.
+   * Get the current module positions from the hardware.
+   *
+   * <p>This is required to create a {@link SwerveDrivePoseEstimator}.
+   */
+  private SwerveModulePosition[] getModulePositions()
+  {
+    var modules = swerveDrive.getModules();
+    SwerveModulePosition[] positions = new SwerveModulePosition[modules.length];
+    for (int i = 0; i < modules.length; i++)
+    {
+      // YAGSL provides a direct module position (distance + angle) via getPosition().
+      // This should be more accurate than integrating wheel speed ourselves.
+      positions[i] = modules[i].getPosition();
+    }
+    return positions;
+  }
+
+   /* Set chassis speeds with closed-loop velocity control.
    *
    * @param chassisSpeeds Chassis Speeds to set.
    */
@@ -606,7 +668,7 @@ public class SwerveSubsystem extends SubsystemBase
    *
    * @return true if the red alliance, false if blue. Defaults to false if none is available.
    */
-  private boolean isRedAlliance()
+  public boolean isRedAlliance()
   {
     var alliance = DriverStation.getAlliance();
     return alliance.isPresent() ? alliance.get() == DriverStation.Alliance.Red : false;
@@ -769,7 +831,7 @@ public class SwerveSubsystem extends SubsystemBase
   }
 
   public Translation2d getGyroAcceleration() {
-        return currentAccelVector;
+    return currentAccelVector;
   }
 
   /**
@@ -788,5 +850,35 @@ public class SwerveSubsystem extends SubsystemBase
     previousVelocity = currentVelocity;
 
     return new Translation2d(ax, ay);    
+  }
+
+  public SwerveModulePosition getPosition()
+  {
+    SwerveModulePosition[] positions = getModulePositions();
+    return positions.length > 0 ? positions[0] : new SwerveModulePosition(0.0, new Rotation2d());
+  }
+
+  PIDController positionRotationPid = new PIDController(5.0, 0.0, 0.5);
+  {
+    positionRotationPid.enableContinuousInput(0, Units.degreesToRadians(360.0));
+    SmartDashboard.putData("Position rotation pid", positionRotationPid);
+  }
+
+  public Rotation2d getGyroRotation() {
+    return poseEstimator.getEstimatedPosition().getRotation();
+  }
+
+  public Rotation2d getGyroRotation2d() {
+    double[] ypr = new double[3];
+    pigeon.getYawPitchRoll(ypr);
+    return Rotation2d.fromDegrees(ypr[0]);
+  }
+
+  public void rotationPidDrive(double x, double y, double angle, double angularVelocity, double angularAcceleration) {
+    double kV = 1.04935;
+    double kA = 0.0;
+    var thetaSpeed = positionRotationPid.calculate(getPose().getRotation().getRadians(), angle)
+            + angularVelocity * kV + angularAcceleration * kA;
+    drive(ChassisSpeeds.fromFieldRelativeSpeeds(x, y, thetaSpeed, getGyroRotation()));
   }
 }

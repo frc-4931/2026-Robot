@@ -24,7 +24,7 @@ public final class Constants
   public static final double LOOP_TIME  = 0.13; //s, 20ms + 110ms sprk max velocity lag
   // Maximum speed of the robot in meters per second, used to limit acceleration.
   public static final double MAX_SPEED  = Units.feetToMeters(14.5);
-  
+  public static final double SHOOT_ANGLE_RANGE_RAD = 1.0;
   // Maximum drive speed of the robot in meters per second.
   public static final double speedMultiplier = 0.65;
   public static final double rotationMultiplier = 0.65;

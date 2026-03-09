@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -21,7 +22,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
@@ -50,7 +51,7 @@ public class RobotContainer
                                                                 () -> driverXbox.getLeftY() * -1,
                                                                 () -> driverXbox.getLeftX() * -1)
                                                             .withControllerRotationAxis(driverXbox::getRightX)
-                                                            .deadband(OperatorConstants.DEADBAND)
+                                                            .deadband(Constants.OperatorConstants.DEADBAND)
                                                             .scaleTranslation(0.8)
                                                             .allianceRelativeControl(true);
 
@@ -72,7 +73,7 @@ public class RobotContainer
                                                                         () -> -driverXbox.getLeftX())
                                                                     .withControllerRotationAxis(() -> driverXbox.getRawAxis(
                                                                         2))
-                                                                    .deadband(OperatorConstants.DEADBAND)
+                                                                    .deadband(Constants.OperatorConstants.DEADBAND)
                                                                     .scaleTranslation(0.8)
                                                                     .allianceRelativeControl(true);
   // Derive the heading axis with math!
@@ -195,6 +196,30 @@ public class RobotContainer
       driverXbox.rightBumper().onTrue(Commands.none());
     }
 
+  }
+
+  public static Translation2d getControls(CommandXboxController m_driverController) {
+
+    // var yInput = Math.abs(m_driverController.getLeftY()) *
+    // m_driverController.getLeftY() * MAX_LINEAR_SPEED_TELEOP;
+    // var xInput = -Math.abs(m_driverController.getLeftX()) *
+    // m_driverController.getLeftX() * MAX_LINEAR_SPEED_TELEOP;
+    var isRed = DriverStation.getAlliance().orElse(Alliance.Red) == Alliance.Red;
+    double xInput;
+    double yInput;
+    if (!isRed) {
+        xInput = -Math.abs(m_driverController.getLeftY()) * m_driverController.getLeftY()
+            * Constants.MAX_SPEED;
+        yInput = -Math.abs(m_driverController.getLeftX()) * m_driverController.getLeftX()
+            * Constants.MAX_SPEED;
+    } else {
+        xInput = Math.abs(m_driverController.getLeftY()) * m_driverController.getLeftY()
+            * Constants.MAX_SPEED;
+        yInput = Math.abs(m_driverController.getLeftX()) * m_driverController.getLeftX()
+            * Constants.MAX_SPEED;
+    }
+
+    return new Translation2d(xInput, yInput);
   }
 
   /**

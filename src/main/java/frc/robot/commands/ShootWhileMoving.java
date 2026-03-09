@@ -9,20 +9,23 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants;
+import static frc.robot.Constants.SHOOT_ANGLE_RANGE_RAD;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import swervelib.SwerveDrive;
+import static frc.robot.RobotContainer.getControls;
+// import static frc.robot.RobotContainer.isRedAlliance;;
 // import frc.robot.subsystems.Drive;
 // import frc.robot.subsystems.Intake;
 // import frc.robot.subsystems.Shooter;
 // import org.littletonrobotics.junction.Logger;
 
 // import static frc.robot.Constants.SHOOT_ANGLE_RANGE_RAD;
-// import static frc.robot.RobotContainer.getControls;
-// import static frc.robot.RobotContainer.isRed;
+// import static frc.robot.RobotContainer.getGyroAccelerationMagols;
+
 
 public class ShootWhileMoving extends Command {
-    private final SwerveDrive drive;
+    private final SwerveSubsystem drive;
     // private final Drive drive;
     // private final Intake intake;
     // private final Shooter shooter;
@@ -39,7 +42,7 @@ public class ShootWhileMoving extends Command {
     private static final double SHOOT_BOOST_TIME_S = 0.4;
     private double boostTillTime = 0;
 
-    public ShootWhileMoving(SwerveDrive drive, Shooter shooter, CommandXboxController controller, Intake intake) {
+    public ShootWhileMoving(SwerveSubsystem drive, Shooter shooter, CommandXboxController controller, Intake intake) {
         this.drive = drive;
         this.shooter = shooter;
         this.controller = controller;
@@ -61,7 +64,7 @@ public class ShootWhileMoving extends Command {
         Translation2d robotPositionT0 = drive.getPose().getTranslation();
 
         var linearVelocity = robotVelocity.getNorm();
-        Translation3d robotAccel = drive.getGyroAcceleration(); // Using gyro-based acceleration for prediction
+        Translation2d robotAccel = drive.getGyroAcceleration(); // Using gyro-based acceleration for prediction
         var linearAccel = robotAccel.getNorm();
         //Translation3d linearAccel = drive.getGyro().getAccel(); // Might use instead  var linearAccel = drive.getYAGSLAcceleration();
         double timeTillStop;
