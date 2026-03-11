@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.commands.FixedSpeedShot;
 import java.io.File;
 import swervelib.SwerveInputStream;
 
@@ -197,7 +198,9 @@ public class RobotContainer
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       driverXbox.rightBumper().onTrue(Commands.none());
-      // driverXbox.rightTrigger().whileTrue(new FixedSpeedShot(twoshootermotor,6000.0));
+
+      driverXbox.rightTrigger().whileTrue(new FixedSpeedShot(twoshootermotor,400.0));
+      driverXbox.leftTrigger().whileTrue(new FixedSpeedShot(twoshootermotor,2000.0));
       // These will only execute if the Robot is physically put into "Test Mode"
       driverXbox.povUp().whileTrue(
           twoshootermotor.sysIdQuasistatic(Direction.kForward)

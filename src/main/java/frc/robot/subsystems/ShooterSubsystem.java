@@ -41,12 +41,12 @@ public class ShooterSubsystem extends SubsystemBase {
         leaderConfig.closedLoop
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
             // The PID values (kP, kI, kD)
-            .pid(0.050423, 0, 0, ClosedLoopSlot.kSlot0)
+            .pid(0.03745, 0, 0, ClosedLoopSlot.kSlot0)
             // The Feedforward values (kS, kV) from SysId
             .velocityFF(0.0) // Usually set to 0 when using kS/kV directly
             .feedForward
-            .kS(0.0668, ClosedLoopSlot.kSlot0)
-            .kV(0.12175, ClosedLoopSlot.kSlot0);
+            .kS(0.16947, ClosedLoopSlot.kSlot0)
+            .kV(0.13773, ClosedLoopSlot.kSlot0);
 
         leaderMotor.configure(leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
