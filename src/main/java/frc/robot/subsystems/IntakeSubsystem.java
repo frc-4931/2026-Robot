@@ -89,7 +89,7 @@ public class IntakeSubsystem extends SubsystemBase {
             )
         );
 
-        dutyCycleMotor = new SparkMax(IntakeRollerMotorConstants.SINGLE_MOTOR_ID, MotorType.kBrushless);
+        dutyCycleMotor = new SparkMax(IntakeConstants.INTAKE_ROLLER_MOTOR_ID, MotorType.kBrushless);
 
         // Set can timeout. Because this project only sets parameters once on
         // construction, the timeout can be long without blocking robot operation. Code
@@ -101,8 +101,8 @@ public class IntakeSubsystem extends SubsystemBase {
         // voltage dips. The current limit helps prevent breaker trips or burning out
         // the motor in the event the practice stalls.
         SparkMaxConfig practiceConfig = new SparkMaxConfig();
-        practiceConfig.voltageCompensation(IntakeRollerMotorConstants.SINGLE_MOTOR_VOLTAGE_COMP);
-        practiceConfig.smartCurrentLimit(IntakeRollerMotorConstants.SINGLE_MOTOR_CURRENT_LIMIT);
+        practiceConfig.voltageCompensation(IntakeConstants.INTAKE_ROLLER_VOLTAGE_COMP);
+        practiceConfig.smartCurrentLimit(IntakeConstants.INTAKE_ROLLER_CURRENT_LIMIT);
         // practiceConfig.idleMode(IdleMode.kBrake);
         practiceConfig.idleMode(IdleMode.kCoast);
         dutyCycleMotor.configure(practiceConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
