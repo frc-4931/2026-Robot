@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 public class IntakeSubsystem extends SubsystemBase {
     private final SparkMax armLeaderMotor;
     private final SparkMax armFollowerMotor; 
-    
+    private final SparkMax dutyCycleMotor;
     private final SparkClosedLoopController pidController;
     private final SysIdRoutine m_sysIdRoutine;
 
@@ -88,6 +88,24 @@ public class IntakeSubsystem extends SubsystemBase {
                 this
             )
         );
+
+        dutyCycleMotor = new SparkMax(IntakeRollerMotorConstants.SINGLE_MOTOR_ID, MotorType.kBrushless);
+
+        // Set can timeout. Because this project only sets parameters once on
+        // construction, the timeout can be long without blocking robot operation. Code
+        // which sets or gets parameters during operation may need a shorter timeout.
+        dutyCycleMotor.setCANTimeout(250);
+
+        // Create and apply configuration for motor. Voltage compensation helps
+        // the motor behave the same as the battery
+        // voltage dips. The current limit helps prevent breaker trips or burning out
+        // the motor in the event the practice stalls.
+        SparkMaxConfig practiceConfig = new SparkMaxConfig();
+        practiceConfig.voltageCompensation(IntakeRollerMotorConstants.SINGLE_MOTOR_VOLTAGE_COMP);
+        practiceConfig.smartCurrentLimit(IntakeRollerMotorConstants.SINGLE_MOTOR_CURRENT_LIMIT);
+        // practiceConfig.idleMode(IdleMode.kBrake);
+        practiceConfig.idleMode(IdleMode.kCoast);
+        dutyCycleMotor.configure(practiceConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     // NEW: Command Factories to trigger tests from RobotContainer
@@ -126,4 +144,5 @@ public class IntakeSubsystem extends SubsystemBase {
         // PID only needs to be sent to the leader; follower follows the output
         pidController.setReference(rpm, SparkBase.ControlType.kVelocity);
     }
+    
 }
