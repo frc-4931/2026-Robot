@@ -4,6 +4,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkBase;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
@@ -47,10 +48,10 @@ public class IntakeSubsystem extends SubsystemBase {
             // .kV(0.12189)
             // .kA(a)
             // .kG(0.00099532) // kG is a linear gravity feedforward, for an elevator
-            .kS(0.14139, ClosedLoopSlot.kSlot0)
-            .kV(0.12189, ClosedLoopSlot.kSlot0)
+            // .kS(0.14139, ClosedLoopSlot.kSlot0)
+            // .kV(0.12189, ClosedLoopSlot.kSlot0)
             .kCos(0.00099532);
-
+        pidController.setSetpoint(IntakeConstants.ARM_SETPOSITION,ControlType.kPosition);
         // armLeaderConfig.closedLoop
             // .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
             // // The PID values (kP, kI, kD)
