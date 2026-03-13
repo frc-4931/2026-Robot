@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 public class IntakeSubsystem extends SubsystemBase {
     private final SparkMax armLeaderMotor;
     private final SparkMax armFollowerMotor; 
-    private final SparkMax dutyCycleMotor;
+    private final SparkMax intakeRollerMotor;
     private final SparkClosedLoopController pidController;
     private final SysIdRoutine m_sysIdRoutine;
 
@@ -89,12 +89,12 @@ public class IntakeSubsystem extends SubsystemBase {
             )
         );
 
-        dutyCycleMotor = new SparkMax(IntakeConstants.INTAKE_ROLLER_MOTOR_ID, MotorType.kBrushless);
+        intakeRollerMotor = new SparkMax(IntakeConstants.INTAKE_ROLLER_MOTOR_ID, MotorType.kBrushless);
 
         // Set can timeout. Because this project only sets parameters once on
         // construction, the timeout can be long without blocking robot operation. Code
         // which sets or gets parameters during operation may need a shorter timeout.
-        dutyCycleMotor.setCANTimeout(250);
+        intakeRollerMotor.setCANTimeout(250);
 
         // Create and apply configuration for motor. Voltage compensation helps
         // the motor behave the same as the battery
@@ -105,7 +105,7 @@ public class IntakeSubsystem extends SubsystemBase {
         practiceConfig.smartCurrentLimit(IntakeConstants.INTAKE_ROLLER_CURRENT_LIMIT);
         // practiceConfig.idleMode(IdleMode.kBrake);
         practiceConfig.idleMode(IdleMode.kCoast);
-        dutyCycleMotor.configure(practiceConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        intakeRollerMotor.configure(practiceConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     // NEW: Command Factories to trigger tests from RobotContainer
