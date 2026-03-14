@@ -41,8 +41,8 @@ public class RaiseIntakeArm extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    intake_subsystem.armRaise();
-    intake_subsystem.stopRoller();
+    // intake_subsystem.armRaise();
+    // intake_subsystem.stopRoller();
     // double speed = 400 * Math.sin(index*Math.PI);
     // System.out.println(speed);
     // intake_subsystem.runSecondMotor(speed);

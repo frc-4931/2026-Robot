@@ -24,8 +24,10 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems. ShooterMotorSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 import java.io.File;
 import swervelib.SwerveInputStream;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -40,7 +42,7 @@ public class RobotContainer
   // The robot's subsystems and commands are defined here...
   // private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/CompetitionChassis"));
   private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
-
+  private final IntakeSubsystem armMotor = new IntakeSubsystem();
   // Establish a Sendable Chooser that will be able to be sent to the SmartDashboard, allowing selection of desired auto
   private final SendableChooser<Command> autoChooser;
 
@@ -194,6 +196,23 @@ public class RobotContainer
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       driverXbox.rightBumper().onTrue(Commands.none());
+
+        driverXbox.povUp().whileTrue(
+                armMotor.sysIdQuasistatic(Direction.kForward)
+                .onlyIf(DriverStation::isTest)
+                );
+            driverXbox.povDown().whileTrue(
+                armMotor.sysIdQuasistatic(Direction.kReverse)
+                .onlyIf(DriverStation::isTest)
+                );
+            driverXbox.povRight().whileTrue(
+                armMotor.sysIdDynamic(Direction.kForward)
+                .onlyIf(DriverStation::isTest)
+                );
+            driverXbox.povLeft().whileTrue(
+                armMotor.sysIdDynamic(Direction.kReverse)
+                .onlyIf(DriverStation::isTest)
+                );
     }
 
   }

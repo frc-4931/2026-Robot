@@ -11,6 +11,9 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
+import edu.wpi.first.math.jni.ArmFeedforwardJNI;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
@@ -154,9 +157,14 @@ public class IntakeSubsystem extends SubsystemBase {
         return true;
     }
 
+    public void pushvalue() {
+        SmartDashboard.putNumber("armLeaderMotor", armLeaderMotor.getEncoder().getPosition());
+        SmartDashboard.putNumber("armFollowerMotor", armFollowerMotor.getEncoder().getPosition());
+    }
+
     public void setVelocity(double rpm) {
         // PID only needs to be sent to the leader; follower follows the output
         pidController.setSetpoint(rpm, SparkBase.ControlType.kVelocity);
     }
-    
+   
 }

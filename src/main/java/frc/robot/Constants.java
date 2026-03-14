@@ -39,7 +39,7 @@ public final class Constants
   public static final class DrivebaseConstants
   {
 
-    // Hold time on motor brakes when disabled
+    // Hold time on motor brakes when disable     d
     public static final double WHEEL_LOCK_TIME = 10; // seconds
   }
 
@@ -66,16 +66,16 @@ public final class Constants
   }
 
   public static final class IntakeConstants {
-        public static final int LEADER_ID = 12;
-        public static final int FOLLOWER_ID = 13;
-        public static final int INTAKE_ROLLER_MOTOR_ID = 14;
-        public static final int CURRENT_LIMIT = 60;
+        public static final int LEADER_ID = 30;
+        public static final int FOLLOWER_ID = 31;
+        public static final int INTAKE_ROLLER_MOTOR_ID = 21;
+        public static final int CURRENT_LIMIT = 20;
         public static final double VOLTAGE_COMP = 10;
         public static final double ARM_SETPOSITION = 0;
-        public static final int INTAKE_ROLLER_CURRENT_LIMIT = 60;
+        public static final int INTAKE_ROLLER_CURRENT_LIMIT = 40;
         public static final double INTAKE_ROLLER_VOLTAGE_COMP = 10;
         public static final double ARM_RAISE = 0.0;
-        public static final double ARM_LOWER = -0.8;
+        public static final double ARM_LOWER = -0.8;  
         public static final double INTAKE_SPEED = 0.5; 
   }
 }
