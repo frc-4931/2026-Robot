@@ -120,24 +120,51 @@ public class IntakeSubsystem extends SubsystemBase {
     @Override
     public void periodic() {}
 
-    public void runSecondMotor(double speed){
-        armLeaderMotor.set(speed);
-    }
-
-    public Command BackwardSlowSpin() {
-        return this.runOnce(() -> { runSecondMotor(-.15);});
-    }
-
     public Command SpinStop() {
         return this.runOnce(() -> { armLeaderMotor.stopMotor(); });
     }
 
-    public void stop() {
-        armLeaderMotor.stopMotor(); // Follower will also stop
+    public Command goToPositionCommand(double targetRotations) {
+        // Keep continuously sending the target so our default "hold position" command doesn't
+        // immediately override it.
+        return run(() -> {
+            // Use kPosition for instant PID or kSmartMotion for a smooth profiled move
+            pidController.setReference(targetRotations, SparkMax.ControlType.kPosition);
+        })
+        // The command is finished when the encoder is within a small range of the target.
+        // Use a tighter tolerance so we don't end early and immediately fall back to the
+        // hold position command.
+        .until(() -> Math.abs(armLeaderMotor.getEncoder().getPosition() - targetRotations) < 0.05);
     }
 
-    public Command ForwordSlowSpin() {
-        return this.runOnce(() -> { runSecondMotor(.15);});
+
+    public void ArmRaise() {
+        goToPositionCommand(IntakeConstants.ARM_RAISE)
+            .withTimeout(2) // Interupts if it takes longer than timeout seconds
+            .handleInterrupt(() -> {
+                // Optional: Logic to run if the command times out (e.g., stop motor)
+                armLeaderMotor.set(0);
+                System.out.println("Position command timed out - potential jam!");
+            });
+    }
+    public boolean ArmLower(){
+        goToPositionCommand(IntakeConstants.ARM_LOWER)
+            .withTimeout(2) // Interupts if it takes longer than timeout seconds
+            .handleInterrupt(() -> {
+                // Optional: Logic to run if the command times out (e.g., stop motor)
+                armLeaderMotor.set(0);
+                System.out.println("Position command timed out - potential jam!");
+            });
+            return true;
+    }
+
+    public boolean IntakeSpin(){
+        return true;
+
+    }
+
+    public boolean IntakeStop(){
+        return true;
     }
 
     public void setVelocity(double rpm) {
