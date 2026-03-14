@@ -40,9 +40,8 @@ public class IntakeSubsystem extends SubsystemBase {
         armLeaderConfig.smartCurrentLimit(IntakeConstants.CURRENT_LIMIT);
         armLeaderConfig.idleMode(IdleMode.kBrake);
 
-
         armLeaderConfig.closedLoop
-        .pid(6.6472, 0, 0.000, ClosedLoopSlot.kSlot0)
+        .pid(15, 0, 0.000, ClosedLoopSlot.kSlot0)
         .feedForward
             .kS(0.14139)
             // .kV(0.12189)
@@ -51,18 +50,6 @@ public class IntakeSubsystem extends SubsystemBase {
             // .kS(0.14139, ClosedLoopSlot.kSlot0)
             // .kV(0.12189, ClosedLoopSlot.kSlot0)
             .kCos(0.00099532);
-        pidController.setSetpoint(IntakeConstants.ARM_SETPOSITION,ControlType.kPosition);
-        // armLeaderConfig.closedLoop
-            // .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-            // // The PID values (kP, kI, kD)
-            // .pid(0.050423, 0, 0, ClosedLoopSlot.kSlot0)
-            // // The Feedforward values (kS, kV) from SysId
-            // .velocityFF(0.0) // Usually set to 0 when using kS/kV directly
-            // .feedForward
-            // .kS(0.0668, ClosedLoopSlot.kSlot0)
-            // .kV(0.12175, ClosedLoopSlot.kSlot0);
-
-        armLeaderMotor.configure(armLeaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         // 3. Configure Follower to be Inverted
         SparkMaxConfig armFollowerConfig = new SparkMaxConfig();
@@ -129,7 +116,7 @@ public class IntakeSubsystem extends SubsystemBase {
         // immediately override it.
         return run(() -> {
             // Use kPosition for instant PID or kSmartMotion for a smooth profiled move
-            pidController.setReference(targetRotations, SparkMax.ControlType.kPosition);
+            pidController.setSetpoint(targetRotations, SparkMax.ControlType.kPosition);
         })
         // The command is finished when the encoder is within a small range of the target.
         // Use a tighter tolerance so we don't end early and immediately fall back to the
@@ -169,7 +156,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public void setVelocity(double rpm) {
         // PID only needs to be sent to the leader; follower follows the output
-        pidController.setReference(rpm, SparkBase.ControlType.kVelocity);
+        pidController.setSetpoint(rpm, SparkBase.ControlType.kVelocity);
     }
     
 }

@@ -74,8 +74,8 @@ public final class Constants
         public static final double ARM_SETPOSITION = 0;
         public static final int INTAKE_ROLLER_CURRENT_LIMIT = 60;
         public static final double INTAKE_ROLLER_VOLTAGE_COMP = 10;
-        public static final double ARM_RAISE = 0.5;
-        public static final double ARM_LOWER = 1;
+        public static final double ARM_RAISE = 0.0;
+        public static final double ARM_LOWER = -0.8;
         public static final double INTAKE_SPEED = 0.5; 
   }
 }
