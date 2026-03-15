@@ -42,6 +42,7 @@ public class IntakeSubsystem extends SubsystemBase {
         armLeaderConfig.voltageCompensation(IntakeConstants.VOLTAGE_COMP);
         armLeaderConfig.smartCurrentLimit(IntakeConstants.CURRENT_LIMIT);
         armLeaderConfig.idleMode(IdleMode.kBrake);
+        armLeaderConfig.closedLoop.allowedClosedLoopError(0.04, ClosedLoopSlot.kSlot0);
 
         armLeaderConfig.closedLoop
         .pid(15, 0, 0.000, ClosedLoopSlot.kSlot0)
