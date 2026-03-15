@@ -19,9 +19,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.IntakeSpinCommand;
+import frc.robot.commands.IntakeStopCommand;
+import frc.robot.commands.LowerIntakeArm;
+import frc.robot.commands.RaiseIntakeArm;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems. ShooterMotorSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -42,7 +47,16 @@ public class RobotContainer
   // The robot's subsystems and commands are defined here...
   // private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/CompetitionChassis"));
   private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
-  private final IntakeSubsystem armMotor = new IntakeSubsystem();
+
+  private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+  private final RaiseIntakeArm raiseIntakeCommand = new RaiseIntakeArm(intakeSubsystem);
+  private final LowerIntakeArm lowerIntakeCommand = new LowerIntakeArm(intakeSubsystem);
+  private final IntakeSpinCommand intakeSpinCommand = new IntakeSpinCommand(intakeSubsystem);
+  private final IntakeStopCommand intakeStopCommand = new IntakeStopCommand(intakeSubsystem);
+
+  private final Command runIntakeCommand = new ParallelCommandGroup(new LowerIntakeArm(intakeSubsystem), new IntakeSpinCommand(intakeSubsystem));
+  private final Command stowIntakeCommand = new ParallelCommandGroup(new RaiseIntakeArm(intakeSubsystem), new IntakeStopCommand(intakeSubsystem));
+
   // Establish a Sendable Chooser that will be able to be sent to the SmartDashboard, allowing selection of desired auto
   private final SendableChooser<Command> autoChooser;
 
@@ -173,21 +187,41 @@ public class RobotContainer
       driverXbox.button(2).whileTrue(Commands.runEnd(() -> driveDirectAngleKeyboard.driveToPoseEnabled(true),
                                                      () -> driveDirectAngleKeyboard.driveToPoseEnabled(false)));
 
-//      driverXbox.b().whileTrue(
-//          drivebase.driveToPose(
-//              new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
-//                              );
-
     }
+
     if (DriverStation.isTest())
     {
       drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocity); // Overrides drive command above!
 
-      driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
+      // driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       driverXbox.start().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       driverXbox.back().whileTrue(drivebase.centerModulesCommand());
       driverXbox.leftBumper().onTrue(Commands.none());
       driverXbox.rightBumper().onTrue(Commands.none());
+
+      driverXbox.a().onTrue(lowerIntakeCommand);
+      driverXbox.b().onTrue(raiseIntakeCommand);
+      driverXbox.x().whileTrue(intakeSpinCommand);
+      driverXbox.y().whileTrue(intakeStopCommand);
+      driverXbox.rightTrigger().onTrue(runIntakeCommand);
+      driverXbox.leftTrigger().onTrue(stowIntakeCommand);
+
+      driverXbox.povUp().whileTrue(
+          intakeSubsystem.sysIdQuasistatic(Direction.kForward)
+          .onlyIf(DriverStation::isTest)
+          );
+      driverXbox.povDown().whileTrue(
+          intakeSubsystem.sysIdQuasistatic(Direction.kReverse)
+          .onlyIf(DriverStation::isTest)
+          );
+      driverXbox.povRight().whileTrue(
+          intakeSubsystem.sysIdDynamic(Direction.kForward)
+          .onlyIf(DriverStation::isTest)
+          );
+      driverXbox.povLeft().whileTrue(
+          intakeSubsystem.sysIdDynamic(Direction.kReverse)
+          .onlyIf(DriverStation::isTest)
+          );
     } else
     {
       driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
@@ -197,22 +231,7 @@ public class RobotContainer
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       driverXbox.rightBumper().onTrue(Commands.none());
 
-        driverXbox.povUp().whileTrue(
-                armMotor.sysIdQuasistatic(Direction.kForward)
-                .onlyIf(DriverStation::isTest)
-                );
-            driverXbox.povDown().whileTrue(
-                armMotor.sysIdQuasistatic(Direction.kReverse)
-                .onlyIf(DriverStation::isTest)
-                );
-            driverXbox.povRight().whileTrue(
-                armMotor.sysIdDynamic(Direction.kForward)
-                .onlyIf(DriverStation::isTest)
-                );
-            driverXbox.povLeft().whileTrue(
-                armMotor.sysIdDynamic(Direction.kReverse)
-                .onlyIf(DriverStation::isTest)
-                );
+
     }
 
   }
