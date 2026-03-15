@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.spark.SparkMax;
+// import com.revrobotics.spark.SparkMaxLimitSwitch;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkBase;
@@ -8,9 +9,15 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.LimitSwitchConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 
 import edu.wpi.first.math.jni.ArmFeedforwardJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,6 +35,8 @@ public class IntakeSubsystem extends SubsystemBase {
     private final SparkMax armFollowerMotor; 
     private final SparkMax intakeRollerMotor;
     private final SparkClosedLoopController pidController;
+    private final SparkLimitSwitch forwardLimitSwitch;
+    private final SparkLimitSwitch reverseLimitSwitch;
     private final SysIdRoutine m_sysIdRoutine;
 
     public IntakeSubsystem() {
@@ -43,11 +52,19 @@ public class IntakeSubsystem extends SubsystemBase {
         armLeaderConfig.smartCurrentLimit(IntakeConstants.CURRENT_LIMIT);
         armLeaderConfig.idleMode(IdleMode.kBrake);
         armLeaderConfig.closedLoop.allowedClosedLoopError(0.04, ClosedLoopSlot.kSlot0);
+        // 3.5 Configure magnetic limit switches on leader
+        armLeaderConfig.limitSwitch
+            .forwardLimitSwitchType(LimitSwitchConfig.Type.kNormallyOpen)
+            .forwardLimitSwitchEnabled(true); // Automatically stops motor when hit
+            // .reverseLimitSwitchType(LimitSwitchConfig.Type.kNormallyOpen)
+            // .reverseLimitSwitchEnabled(true);
+        this.forwardLimitSwitch = armLeaderMotor.getForwardLimitSwitch();
+        this.reverseLimitSwitch = armLeaderMotor.getReverseLimitSwitch();
 
         armLeaderConfig.closedLoop
-        .pid(15, 0, 0.000, ClosedLoopSlot.kSlot0)
-        .feedForward
-            .kS(0.14139)
+            .pid(15, 0, 0.000, ClosedLoopSlot.kSlot0)
+            .feedForward
+                .kS(0.14139)
             // .kV(0.12189)
             // .kA(a)
             // .kG(0.00099532) // kG is a linear gravity feedforward, for an elevator
@@ -109,53 +126,130 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     @Override
-    public void periodic() {}
+    public void periodic() {
+        if (isArmLimitHit()) {
+            handleArmLimitHit();
+        }
+        pushvalue();
+    }
 
     public Command SpinStop() {
         return this.runOnce(() -> { armLeaderMotor.stopMotor(); });
     }
 
     public Command goToPositionCommand(double targetRotations) {
-        // Keep continuously sending the target so our default "hold position" command doesn't
-        // immediately override it.
         return run(() -> {
-            // Use kPosition for instant PID or kSmartMotion for a smooth profiled move
             pidController.setSetpoint(targetRotations, SparkMax.ControlType.kPosition);
         })
-        // The command is finished when the encoder is within a small range of the target.
-        // Use a tighter tolerance so we don't end early and immediately fall back to the
-        // hold position command.
         .until(() -> Math.abs(armLeaderMotor.getEncoder().getPosition() - targetRotations) < 0.05);
     }
 
-
-    public void ArmRaise() {
-        goToPositionCommand(IntakeConstants.ARM_RAISE)
-            .withTimeout(2) // Interupts if it takes longer than timeout seconds
-            .handleInterrupt(() -> {
-                // Optional: Logic to run if the command times out (e.g., stop motor)
-                armLeaderMotor.set(0);
-                System.out.println("Position command timed out - potential jam!");
-            });
-    }
-    public boolean ArmLower(){
-        goToPositionCommand(IntakeConstants.ARM_LOWER)
-            .withTimeout(2) // Interupts if it takes longer than timeout seconds
-            .handleInterrupt(() -> {
-                // Optional: Logic to run if the command times out (e.g., stop motor)
-                armLeaderMotor.set(0);
-                System.out.println("Position command timed out - potential jam!");
-            });
-            return true;
+    private boolean isArmLimitHit() {
+        return forwardLimitSwitch.isPressed() || reverseLimitSwitch.isPressed();
     }
 
-    public boolean IntakeSpin(){
-        return true;
-
+    private void handleArmLimitHit() {
+        armLeaderMotor.stopMotor();
+        armFollowerMotor.stopMotor();
+        armLeaderMotor.getEncoder().setPosition(0.0);
+        armFollowerMotor.getEncoder().setPosition(0.0);
+        SmartDashboard.putBoolean("armLimitHit", true);
+        SmartDashboard.putNumber("armLeaderMotor", 0.0);
+        SmartDashboard.putNumber("armFollowerMotor", 0.0);
     }
 
-    public boolean IntakeStop(){
-        return true;
+    private boolean moveArmTo(double targetRotations) {
+        final double tolerance = 0.05;
+        final double timeout = 2.0;
+        final double startTime = Timer.getFPGATimestamp();
+        pidController.setSetpoint(targetRotations, SparkMax.ControlType.kPosition);
+
+        while (Timer.getFPGATimestamp() - startTime < timeout) {
+            if (isArmLimitHit()) {
+                handleArmLimitHit();
+                if (targetRotations == IntakeConstants.ARM_LOWER) {
+                    return true;
+                }
+                return false;
+            }
+
+            double error = Math.abs(armLeaderMotor.getEncoder().getPosition() - targetRotations);
+            if (error < tolerance) {
+                return true;
+            }
+
+            Timer.delay(0.01);
+        }
+
+        armLeaderMotor.stopMotor();
+        return false;
+    }
+
+    public boolean ArmRaise() {
+        boolean success = moveArmTo(IntakeConstants.ARM_RAISE);
+        if (!success) {
+            success = moveArmTo(IntakeConstants.ARM_RAISE);
+        }
+        return success;
+    }
+
+    public boolean ArmLower() {
+        boolean success = moveArmTo(IntakeConstants.ARM_LOWER);
+        if (!success) {
+            success = moveArmTo(IntakeConstants.ARM_LOWER);
+        }
+        return success;
+    }
+
+    public boolean IntakeSpin() {
+        try {
+            intakeRollerMotor.set(IntakeConstants.INTAKE_SPEED);
+            // verify motor current output not 0 (best-effort check)
+            return Math.abs(intakeRollerMotor.get()) > 0.01;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean IntakeStop() {
+        try {
+            intakeRollerMotor.stopMotor();
+            return Math.abs(intakeRollerMotor.get()) < 0.01;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public Command RunIntake() {
+        return this.runOnce(() -> {
+            boolean armOk = ArmLower();
+            if (!armOk) {
+                armOk = ArmLower();
+            }
+            boolean rollerOk = IntakeSpin();
+            if (!rollerOk) {
+                rollerOk = IntakeSpin();
+            }
+            if (!armOk || !rollerOk) {
+                System.out.println("RunIntake: failed first attempt; armOk=" + armOk + ", rollerOk=" + rollerOk);
+            }
+        });
+    }
+
+    public Command StoweIntake() {
+        return this.runOnce(() -> {
+            boolean armOk = ArmRaise();
+            if (!armOk) {
+                armOk = ArmRaise();
+            }
+            boolean stopOk = IntakeStop();
+            if (!stopOk) {
+                stopOk = IntakeStop();
+            }
+            if (!armOk || !stopOk) {
+                System.out.println("StoweIntake: failed first attempt; armOk=" + armOk + ", stopOk=" + stopOk);
+            }
+        });
     }
 
     public void pushvalue() {
@@ -163,9 +257,4 @@ public class IntakeSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("armFollowerMotor", armFollowerMotor.getEncoder().getPosition());
     }
 
-    public void setVelocity(double rpm) {
-        // PID only needs to be sent to the leader; follower follows the output
-        pidController.setSetpoint(rpm, SparkBase.ControlType.kVelocity);
-    }
-   
 }
