@@ -27,6 +27,7 @@ import frc.robot.commands.IntakeSpinCommand;
 import frc.robot.commands.IntakeStopCommand;
 import frc.robot.commands.LowerIntakeArm;
 import frc.robot.commands.RaiseIntakeArm;
+import frc.robot.commands.SuperIntakeButton;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems. ShooterMotorSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -56,6 +57,7 @@ public class RobotContainer
 
   private final Command runIntakeCommand = new ParallelCommandGroup(new LowerIntakeArm(intakeSubsystem), new IntakeSpinCommand(intakeSubsystem));
   private final Command stowIntakeCommand = new ParallelCommandGroup(new RaiseIntakeArm(intakeSubsystem), new IntakeStopCommand(intakeSubsystem));
+  private final SuperIntakeButton superIntakeButtonCommand = new SuperIntakeButton(runIntakeCommand, stowIntakeCommand);
 
   // Establish a Sendable Chooser that will be able to be sent to the SmartDashboard, allowing selection of desired auto
   private final SendableChooser<Command> autoChooser;
