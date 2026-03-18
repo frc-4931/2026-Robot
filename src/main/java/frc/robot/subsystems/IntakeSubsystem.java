@@ -51,6 +51,7 @@ public class IntakeSubsystem extends SubsystemBase {
         armLeaderConfig.voltageCompensation(IntakeConstants.VOLTAGE_COMP);
         armLeaderConfig.smartCurrentLimit(IntakeConstants.CURRENT_LIMIT);
         armLeaderConfig.idleMode(IdleMode.kBrake);
+
         armLeaderConfig.closedLoop.allowedClosedLoopError(0.04, ClosedLoopSlot.kSlot0);
         // 3.5 Configure magnetic limit switches on leader
         armLeaderConfig.limitSwitch
@@ -118,6 +119,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     // NEW: Command Factories to trigger tests from RobotContainer
     public Command sysIdQuasistatic(Direction direction) {
+        // SmartDashboard.putNumber("armLeaderMotor", m_sysIdRoutine.);
         return m_sysIdRoutine.quasistatic(direction);
     }
 
@@ -138,6 +140,9 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public Command goToPositionCommand(double targetRotations) {
+        SmartDashboard.putNumber("intakeArmSetpoint",targetRotations);
+        // Keep continuously sending the target so our default "hold position" command doesn't
+        // immediately override it.
         return run(() -> {
             pidController.setSetpoint(targetRotations, SparkMax.ControlType.kPosition);
         })

@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterMotorSubsystem;
 
-import org.littletonrobotics.urcl.URCL;
+// import org.littletonrobotics.urcl.URCL;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.net.WebServer;
@@ -53,7 +53,7 @@ public class Robot extends TimedRobot
   public void robotInit()
   {
     DataLogManager.start();
-    URCL.start();
+    // URCL.start();
 
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
