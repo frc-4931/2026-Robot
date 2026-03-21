@@ -233,6 +233,7 @@ public class RobotContainer
     {
       driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
+      driverXbox.y().onTrue(superIntakeButtonCommandJoystick);
       driverXbox.start().whileTrue(Commands.none());
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
@@ -244,12 +245,13 @@ public class RobotContainer
       redbuttonbox.button(5).whileTrue(intakeSubsystem.SpinStop());
       redbuttonbox.button(6).whileTrue(intakeSubsystem.goToPositionCommand(0.));
       redbuttonbox.button(7).whileTrue(intakeSubsystem.goToPositionCommand(-0.8));
-      redbuttonbox.button(8).whileTrue(intakeSubsystem.RunIntake(0.5));
-      redbuttonbox.button(9).whileTrue(intakeSubsystem.StopIntake(0.5));
-      redbuttonbox.button(10).whileTrue(ShooterMotorSubsystem.ForwordSlowSpin(0.5));
-      otherbuttonbox.button(1).whileTrue(ShooterMotorSubsystem.ForwordSlowSpin(-0.5));
-      otherbuttonbox.button(3).whileTrue(ShooterMotorSubsystem.ForwordFastSpin(-1));
-      otherbuttonbox.button(2).whileTrue(ShooterMotorSubsystem.SpinStop(0.5));
+    //TODO: ask Eddie how to fix these.
+      // redbuttonbox.button(8).whileTrue(intakeSubsystem.RunIntake(0.5));
+      // redbuttonbox.button(9).whileTrue(intakeSubsystem.StopIntake(0.5));
+      // redbuttonbox.button(10).whileTrue(ShooterMotorSubsystem.ForwordSlowSpin(0.5));
+      // otherbuttonbox.button(1).whileTrue(ShooterMotorSubsystem.ForwordSlowSpin(-0.5));
+      // otherbuttonbox.button(3).whileTrue(ShooterMotorSubsystem.ForwordFastSpin(-1));
+      // otherbuttonbox.button(2).whileTrue(ShooterMotorSubsystem.SpinStop(0.5));
      
 
       // buttonBox2.(button5 ).onTrue(algaeArm.ArmStop().andThen(roller.CoralStop()).andThen(climber.ClimbStop()));
