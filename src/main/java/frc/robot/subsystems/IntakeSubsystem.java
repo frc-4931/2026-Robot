@@ -40,6 +40,7 @@ public class IntakeSubsystem extends SubsystemBase {
     private final SparkLimitSwitch forwardLimitSwitch;
     private final SparkLimitSwitch reverseLimitSwitch;
     private final SysIdRoutine m_sysIdRoutine;
+    private IdleMode armIdleMode = IdleMode.kBrake;
 
     public IntakeSubsystem() {
         // 1. Initialize Motors
@@ -152,7 +153,14 @@ public class IntakeSubsystem extends SubsystemBase {
         return run(() -> {
             pidController.setSetpoint(targetRotations, SparkMax.ControlType.kPosition);
         })
-        .until(() -> Math.abs(armLeaderMotor.getEncoder().getPosition() - targetRotations) < 0.05);
+        .until(() -> Math.abs(armLeaderMotor.getEncoder().getPosition() - targetRotations) < 0.05)
+        .andThen(runOnce(() -> {
+            if (targetRotations == 0) {
+                setArmIdleMode(IdleMode.kBrake);
+            } else {
+                setArmIdleMode(IdleMode.kCoast);
+            }
+        }));
     }
 
     private boolean isArmLimitHit() {
@@ -303,10 +311,25 @@ public class IntakeSubsystem extends SubsystemBase {
             () -> {
                 pidController.setReference(0, SparkMax.ControlType.kPosition);
                 intakeRollerMotor.stopMotor();
+                setArmIdleMode(IdleMode.kBrake);
             },
             this // Requirement
         );
     }
 
+    public void setArmIdleMode(IdleMode mode) {
+        armIdleMode = mode;
+        SparkMaxConfig config = new SparkMaxConfig();
+        config.idleMode(mode);
+        armLeaderMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+        armFollowerMotor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    }
+
+    public Command toggleArmIdleMode() {
+        return runOnce(() -> {
+            IdleMode newMode = armIdleMode == IdleMode.kBrake ? IdleMode.kCoast : IdleMode.kBrake;
+            setArmIdleMode(newMode);
+        });
+    }
 
 }

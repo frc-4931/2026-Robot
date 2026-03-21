@@ -273,12 +273,18 @@ public class RobotContainer
         );
 
       redbuttonbox.button(9).whileTrue(raiseIntakeCommand);
-      redbuttonbox.button(10).whileTrue(shooterMotorSubsystem.SpinAtSpeed(0.75).alongWith(indexer.FeedFast()));
+      redbuttonbox.button(10).onTrue(
+          Commands.parallel(
+              shooterMotorSubsystem.SpinAtSpeed(0.75),
+              Commands.waitSeconds(2).andThen(indexer.FeedFast())
+          )
+      );
       otherbuttonbox.button(1).whileTrue(shooterMotorSubsystem.SpinAtSpeed(-0.5));
       otherbuttonbox.button(2).whileTrue(shooterMotorSubsystem.SpinStop());
       otherbuttonbox.button(3).whileTrue(shooterMotorSubsystem.SpinAtSpeed(.9));
       otherbuttonbox.button(4).whileTrue(indexer.StopSpin());
       otherbuttonbox.button(5).whileTrue(indexer.FeedSlow());
+      otherbuttonbox.button(6).onTrue(intakeSubsystem.toggleArmIdleMode());
       
       driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       driverXbox.b().whileTrue(indexer.StopSpin());

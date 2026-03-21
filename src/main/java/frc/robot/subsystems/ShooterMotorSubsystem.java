@@ -105,7 +105,7 @@ public class ShooterMotorSubsystem extends SubsystemBase {
     }
 
     public Command SpinAtSpeed(double speed) {
-        return this.runOnce(() -> { runLeadMotor(speed);});
+        return this.run(() -> { runLeadMotor(speed);});
     }
 
     public void setVelocity(double rpm) {
