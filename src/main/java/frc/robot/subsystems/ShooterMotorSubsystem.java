@@ -105,7 +105,7 @@ public class ShooterMotorSubsystem extends SubsystemBase {
     }
 
     public Command ForwordSlowSpin() {
-        return this.runOnce(() -> { runSecondMotor(.15);});
+        return this.runOnce(() -> { runSecondMotor();});
     }
 
     public void setVelocity(double rpm) {

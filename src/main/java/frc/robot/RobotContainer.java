@@ -250,8 +250,8 @@ public class RobotContainer
       redbuttonbox.button(9).whileTrue(intakeSubsystem.IntakeStop());
       redbuttonbox.button(10).whileTrue(ShooterMotorSubsystem.ForwordSlowSpin(0.5));
       otherbuttonbox.button(1).whileTrue(ShooterMotorSubsystem.ForwordSlowSpin(-0.5));
-      otherbuttonbox.button(3).whileTrue(ShooterMotorSubsystem.ForwordFastSpin(-.15));
-      otherbuttonbox.button(2).whileTrue(ShooterMotorSubsystem.SpinStop(0.5));
+      otherbuttonbox.button(3).whileTrue(ShooterMotorSubsystem.ForwordSlowSpin(.75));
+      otherbuttonbox.button(2).whileTrue(ShooterMotorSubsystem.SpinStop());
      
 
       // buttonBox2.(button5 ).onTrue(algaeArm.ArmStop().andThen(roller.CoralStop()).andThen(climber.ClimbStop()));
