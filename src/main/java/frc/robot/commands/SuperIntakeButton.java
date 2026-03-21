@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class SuperIntakeButton extends Command {
   private final Command runIntakeCommand;
   private final Command stopIntakeCommand;
-  private boolean isRunning = false;
+  private boolean isRunning = true;
 
   public SuperIntakeButton(Command run, Command stop) {
     runIntakeCommand = run;
@@ -22,10 +22,20 @@ public class SuperIntakeButton extends Command {
 
   @Override
   public void initialize() {
-    
+    if(isRunning){
+      runIntakeCommand.initialize();
+    }else{
+      stopIntakeCommand.initialize();
+    }
   }
 
   public void Execute(){
+    
+  }
+
+  // Called once the command ends or is interrupted.
+  @Override
+  public void end(boolean interrupted) {
     if(isRunning){
       isRunning = true;
     }else{
