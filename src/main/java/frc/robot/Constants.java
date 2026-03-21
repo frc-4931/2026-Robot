@@ -59,15 +59,15 @@ public final class Constants
   }
 
   public static final class ShooterMotorConstants {
-        public static final int LEADER_ID = 10;
-        public static final int FOLLOWER_ID = 11;
+        public static final int LEADER_ID = 16;
+        public static final int FOLLOWER_ID = 17;
         public static final int CURRENT_LIMIT = 60;
         public static final double VOLTAGE_COMP = 10;
   }
 
   public static final class IntakeConstants {
-        public static final int LEADER_ID = 30;
-        public static final int FOLLOWER_ID = 31;
+        public static final int LEADER_ID = 29;
+        public static final int FOLLOWER_ID = 30;
         public static final int INTAKE_ROLLER_MOTOR_ID = 21;
         public static final int CURRENT_LIMIT = 20;
         public static final double VOLTAGE_COMP = 10;
