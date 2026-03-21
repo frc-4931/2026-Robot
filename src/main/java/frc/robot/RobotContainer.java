@@ -54,6 +54,7 @@ public class RobotContainer
   private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
 
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+  private final ShooterMotorSubsystem shooterMotorSubsystem = new ShooterMotorSubsystem();
   private final RaiseIntakeArm raiseIntakeCommand = new RaiseIntakeArm(intakeSubsystem);
   private final LowerIntakeArm lowerIntakeCommand = new LowerIntakeArm(intakeSubsystem);
   private final IntakeSpinCommand intakeSpinCommand = new IntakeSpinCommand(intakeSubsystem);
@@ -247,11 +248,12 @@ public class RobotContainer
       redbuttonbox.button(7).whileTrue(intakeSubsystem.goToPositionCommand(-0.8));
     //TODO: ask Eddie how to fix these.
       redbuttonbox.button(8).whileTrue(intakeSubsystem.RunIntake());
+      // Why is this subsystem function not returning a runable? check the subsystem again.
       redbuttonbox.button(9).whileTrue(intakeSubsystem.IntakeStop());
-      redbuttonbox.button(10).whileTrue(ShooterMotorSubsystem.ForwordSlowSpin(0.5));
-      otherbuttonbox.button(1).whileTrue(ShooterMotorSubsystem.ForwordSlowSpin(-0.5));
-      otherbuttonbox.button(3).whileTrue(ShooterMotorSubsystem.ForwordSlowSpin(.75));
-      otherbuttonbox.button(2).whileTrue(ShooterMotorSubsystem.SpinStop());
+      redbuttonbox.button(10).whileTrue(shooterMotorSubsystem.ForwordSlowSpin(0.5));
+      otherbuttonbox.button(1).whileTrue(shooterMotorSubsystem.ForwordSlowSpin(-0.5));
+      otherbuttonbox.button(3).whileTrue(shooterMotorSubsystem.ForwordSlowSpin(.75));
+      otherbuttonbox.button(2).whileTrue(shooterMotorSubsystem.SpinStop());
      
 
       // buttonBox2.(button5 ).onTrue(algaeArm.ArmStop().andThen(roller.CoralStop()).andThen(climber.ClimbStop()));

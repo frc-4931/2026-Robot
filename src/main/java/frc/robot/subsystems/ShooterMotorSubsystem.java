@@ -104,8 +104,8 @@ public class ShooterMotorSubsystem extends SubsystemBase {
         leaderMotor.stopMotor(); // Follower will also stop
     }
 
-    public Command ForwordSlowSpin() {
-        return this.runOnce(() -> { runSecondMotor();});
+    public Command ForwordSlowSpin(double speed) {
+        return this.runOnce(() -> { runSecondMotor(speed);});
     }
 
     public void setVelocity(double rpm) {
