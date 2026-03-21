@@ -29,11 +29,13 @@ import frc.robot.commands.LowerIntakeArm;
 import frc.robot.commands.RaiseIntakeArm;
 import frc.robot.commands.SuperIntakeButton;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
-import frc.robot.subsystems. ShooterMotorSubsystem;
+import frc.robot.subsystems.ShooterMotorSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import java.io.File;
+import frc.robot.subsystems.IndexerSubsystem;
 import swervelib.SwerveInputStream;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -45,6 +47,8 @@ public class RobotContainer
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   final         CommandXboxController driverXbox = new CommandXboxController(0);
+  final CommandJoystick redbuttonbox= new CommandJoystick(1);
+  final CommandJoystick otherbuttonbox= new CommandJoystick(2);
   // The robot's subsystems and commands are defined here...
   // private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve/CompetitionChassis"));
   private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
@@ -57,10 +61,11 @@ public class RobotContainer
 
   private final Command runIntakeCommand = new ParallelCommandGroup(new LowerIntakeArm(intakeSubsystem), new IntakeSpinCommand(intakeSubsystem));
   private final Command stowIntakeCommand = new ParallelCommandGroup(new RaiseIntakeArm(intakeSubsystem), new IntakeStopCommand(intakeSubsystem));
-  private final SuperIntakeButton superIntakeButtonCommand = new SuperIntakeButton(runIntakeCommand, stowIntakeCommand);
+  private final SuperIntakeButton superIntakeButtonCommandJoystick = new SuperIntakeButton(runIntakeCommand, stowIntakeCommand);
 
   // Establish a Sendable Chooser that will be able to be sent to the SmartDashboard, allowing selection of desired auto
   private final SendableChooser<Command> autoChooser;
+  private final IndexerSubsystem indexer= new IndexerSubsystem();
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
@@ -232,6 +237,22 @@ public class RobotContainer
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       driverXbox.rightBumper().whileTrue(intakeSubsystem.goToPositionCommand(-0.6));
+      redbuttonbox.button(1).onTrue(indexer.BackwardSpin());
+      redbuttonbox.button(2).whileTrue(indexer.ForwordSpin());
+      redbuttonbox.button(3).whileTrue(intakeSubsystem.ForwardSpin(0.5));
+      redbuttonbox.button(4).whileTrue(intakeSubsystem.ForwardSpin(-0.5));
+      redbuttonbox.button(5).whileTrue(intakeSubsystem.SpinStop());
+      redbuttonbox.button(6).whileTrue(intakeSubsystem.goToPositionCommand(0.));
+      redbuttonbox.button(7).whileTrue(intakeSubsystem.goToPositionCommand(-0.8));
+      redbuttonbox.button(8).whileTrue(intakeSubsystem.RunIntake(0.5));
+      redbuttonbox.button(9).whileTrue(intakeSubsystem.StopIntake(0.5));
+      redbuttonbox.button(10).whileTrue(ShooterMotorSubsystem.ForwordSlowSpin(0.5));
+      otherbuttonbox.button(1).whileTrue(ShooterMotorSubsystem.ForwordSlowSpin(-0.5));
+      otherbuttonbox.button(3).whileTrue(ShooterMotorSubsystem.ForwordFastSpin(-1));
+      otherbuttonbox.button(2).whileTrue(ShooterMotorSubsystem.SpinStop(0.5));
+     
+
+      // buttonBox2.button(5 ).onTrue(algaeArm.ArmStop().andThen(roller.CoralStop()).andThen(climber.ClimbStop()));
 
 
     }

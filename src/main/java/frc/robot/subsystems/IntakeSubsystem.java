@@ -139,6 +139,10 @@ public class IntakeSubsystem extends SubsystemBase {
         return this.runOnce(() -> { armLeaderMotor.stopMotor(); });
     }
 
+    public Command ForwardSpin(double speed){
+        return this.runOnce(() -> { armLeaderMotor.set(speed); });
+    }
+
     public Command goToPositionCommand(double targetRotations) {
         SmartDashboard.putNumber("intakeArmSetpoint",targetRotations);
         // Keep continuously sending the target so our default "hold position" command doesn't
