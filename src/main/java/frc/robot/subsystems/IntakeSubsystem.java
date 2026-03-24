@@ -9,6 +9,7 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLimitSwitch;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -33,7 +34,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 public class IntakeSubsystem extends SubsystemBase {
     private final SparkMax armLeaderMotor;
     private final SparkMax armFollowerMotor; 
-    private final SparkMax intakeRollerMotor;
+    private final SparkFlex intakeRollerMotor;
     private final SparkClosedLoopController pidController;
     private final SparkLimitSwitch forwardLimitSwitch;
     private final SparkLimitSwitch reverseLimitSwitch;
@@ -98,7 +99,7 @@ public class IntakeSubsystem extends SubsystemBase {
             )
         );
 
-        intakeRollerMotor = new SparkMax(IntakeConstants.INTAKE_ROLLER_MOTOR_ID, MotorType.kBrushless);
+        intakeRollerMotor = new SparkFlex(IntakeConstants.INTAKE_ROLLER_MOTOR_ID, MotorType.kBrushless);
 
         // Set can timeout. Because this project only sets parameters once on
         // construction, the timeout can be long without blocking robot operation. Code
