@@ -267,9 +267,9 @@ public class RobotContainer
       redbuttonbox.button(6).whileTrue(intakeGoToPositionZeroCommand);
       redbuttonbox.button(7).whileTrue(intakeGoToPositionNegPoint8Command);
     //TODO: ask Eddie how to fix these.
-      // redbuttonbox.button(8).whileTrue(intakeSubsystem.RunIntake());
+      redbuttonbox.button(8).whileTrue(intakeSubsystem.RunIntake());
       // Why is this subsystem function not returning a runable? check the subsystem again.
-      //redbuttonbox.button(9).whileTrue(intakeSubsystem.IntakeStop());
+      redbuttonbox.button(9).whileTrue(intakeStopCommand);
       redbuttonbox.button(10).whileTrue(shooterMotorSubsystem.ForwordSlowSpin(0.5));
       otherbuttonbox.button(1).whileTrue(shooterMotorSubsystem.ForwordSlowSpin(-0.5));
       otherbuttonbox.button(3).whileTrue(shooterMotorSubsystem.ForwordSlowSpin(.75));
