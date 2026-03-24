@@ -231,23 +231,24 @@ public class RobotContainer
       driverXbox.b().onTrue(raiseIntakeCommand);
       driverXbox.x().whileTrue(intakeSpinCommand);
       driverXbox.y().whileTrue(intakeStopCommand);
-      // driverXbox.rightTrigger().onTrue(runIntakeCommand);
-      // driverXbox.leftTrigger().onTrue(stowIntakeCommand);
+      driverXbox.rightTrigger().onTrue(shooterMotorSubsystem.ForwordSlowSpin(0.5));
+      driverXbox.leftTrigger().whileTrue(
+          shooterMotorSubsystem.sysIdQuasistatic(Direction.kForward));
 
       driverXbox.povUp().whileTrue(
-          intakeSubsystem.sysIdQuasistatic(Direction.kForward)
+          shooterMotorSubsystem.sysIdQuasistatic(Direction.kForward)
           .onlyIf(DriverStation::isTest)
           );
       driverXbox.povDown().whileTrue(
-          intakeSubsystem.sysIdQuasistatic(Direction.kReverse)
+          shooterMotorSubsystem.sysIdQuasistatic(Direction.kReverse)
           .onlyIf(DriverStation::isTest)
           );
       driverXbox.povRight().whileTrue(
-          intakeSubsystem.sysIdDynamic(Direction.kForward)
+          shooterMotorSubsystem.sysIdDynamic(Direction.kForward)
           .onlyIf(DriverStation::isTest)
           );
       driverXbox.povLeft().whileTrue(
-          intakeSubsystem.sysIdDynamic(Direction.kReverse)
+          shooterMotorSubsystem.sysIdDynamic(Direction.kReverse)
           .onlyIf(DriverStation::isTest)
           );
     } else
