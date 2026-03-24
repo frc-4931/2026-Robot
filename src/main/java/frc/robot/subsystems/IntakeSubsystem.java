@@ -63,7 +63,7 @@ public class IntakeSubsystem extends SubsystemBase {
         this.reverseLimitSwitch = armLeaderMotor.getReverseLimitSwitch();
 
         armLeaderConfig.closedLoop
-            .pid(15, 0, 0.000, ClosedLoopSlot.kSlot0)
+            .pid(.02, 0, 0.000, ClosedLoopSlot.kSlot0)
             .feedForward
                 .kS(0.14139)
             // .kV(0.12189)

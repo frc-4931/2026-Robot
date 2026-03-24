@@ -23,10 +23,17 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.IntakeBackwardSpinCommand;
+import frc.robot.commands.IntakeGoToPositionCommand;
 import frc.robot.commands.IntakeSpinCommand;
+import frc.robot.commands.IntakeBackwardSpinCommand;
 import frc.robot.commands.IntakeStopCommand;
 import frc.robot.commands.LowerIntakeArm;
 import frc.robot.commands.RaiseIntakeArm;
+import frc.robot.commands.IntakeGoToPositionCommand;
+import frc.robot.commands.IntakeGoToPositionZeroCommand;
+import frc.robot.commands.IntakeGoToPositionNegPoint8Command;
+
 import frc.robot.commands.SuperIntakeButton;
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.ShooterMotorSubsystem;
@@ -55,10 +62,16 @@ public class RobotContainer
 
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   private final ShooterMotorSubsystem shooterMotorSubsystem = new ShooterMotorSubsystem();
+  private final IndexerSubsystem indexer = new IndexerSubsystem();
+
   private final RaiseIntakeArm raiseIntakeCommand = new RaiseIntakeArm(intakeSubsystem);
   private final LowerIntakeArm lowerIntakeCommand = new LowerIntakeArm(intakeSubsystem);
   private final IntakeSpinCommand intakeSpinCommand = new IntakeSpinCommand(intakeSubsystem);
+  private final IntakeBackwardSpinCommand intakeBackwardSpinCommand = new IntakeBackwardSpinCommand(intakeSubsystem);
   private final IntakeStopCommand intakeStopCommand = new IntakeStopCommand(intakeSubsystem);
+  private final IntakeGoToPositionCommand intakeGoToPositionCommand = new IntakeGoToPositionCommand(intakeSubsystem);
+  private final IntakeGoToPositionZeroCommand intakeGoToPositionZeroCommand = new IntakeGoToPositionZeroCommand(intakeSubsystem);
+  private final IntakeGoToPositionNegPoint8Command intakeGoToPositionNegPoint8Command = new IntakeGoToPositionNegPoint8Command(intakeSubsystem);
 
   private final Command runIntakeCommand = new ParallelCommandGroup(new LowerIntakeArm(intakeSubsystem), new IntakeSpinCommand(intakeSubsystem));
   private final Command stowIntakeCommand = new ParallelCommandGroup(new RaiseIntakeArm(intakeSubsystem), new IntakeStopCommand(intakeSubsystem));
@@ -66,7 +79,7 @@ public class RobotContainer
 
   // Establish a Sendable Chooser that will be able to be sent to the SmartDashboard, allowing selection of desired auto
   private final SendableChooser<Command> autoChooser;
-  private final IndexerSubsystem indexer= new IndexerSubsystem();
+  
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
@@ -238,16 +251,16 @@ public class RobotContainer
       driverXbox.start().whileTrue(Commands.none());
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.rightBumper().whileTrue(intakeSubsystem.goToPositionCommand(-0.6));
-      redbuttonbox.button(1).onTrue(indexer.BackwardSpin());
-      redbuttonbox.button(2).whileTrue(indexer.ForwordSpin());
-      redbuttonbox.button(3).whileTrue(intakeSubsystem.ForwardSpin(0.5));
-      redbuttonbox.button(4).whileTrue(intakeSubsystem.ForwardSpin(-0.5));
-      redbuttonbox.button(5).whileTrue(intakeSubsystem.SpinStop());
-      redbuttonbox.button(6).whileTrue(intakeSubsystem.goToPositionCommand(0.));
-      redbuttonbox.button(7).whileTrue(intakeSubsystem.goToPositionCommand(-0.8));
+      driverXbox.rightBumper().whileTrue(intakeGoToPositionCommand);
+      // redbuttonbox.button(1).onTrue(indexer.BackwardSpin());
+      // redbuttonbox.button(2).whileTrue(indexer.ForwordSpin());
+      redbuttonbox.button(3).whileTrue(intakeSpinCommand);
+      redbuttonbox.button(4).whileTrue(intakeBackwardSpinCommand);
+      redbuttonbox.button(5).whileTrue(intakeStopCommand);
+      redbuttonbox.button(6).whileTrue(intakeGoToPositionZeroCommand);
+      redbuttonbox.button(7).whileTrue(intakeGoToPositionNegPoint8Command);
     //TODO: ask Eddie how to fix these.
-      redbuttonbox.button(8).whileTrue(intakeSubsystem.RunIntake());
+      // redbuttonbox.button(8).whileTrue(intakeSubsystem.RunIntake());
       // Why is this subsystem function not returning a runable? check the subsystem again.
       //redbuttonbox.button(9).whileTrue(intakeSubsystem.IntakeStop());
       redbuttonbox.button(10).whileTrue(shooterMotorSubsystem.ForwordSlowSpin(0.5));

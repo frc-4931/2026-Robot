@@ -3,19 +3,19 @@ package frc.robot.commands;
 import frc.robot.subsystems.IntakeSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 
-public class IntakeStopCommand extends Command {
+public class IntakeBackwardSpinCommand extends Command {
     private final IntakeSubsystem intake_subsystem;
 
-    public IntakeStopCommand(IntakeSubsystem subsystem) {
+    public IntakeBackwardSpinCommand(IntakeSubsystem subsystem) {
         intake_subsystem = subsystem;
         addRequirements(subsystem);
     }
 
     @Override
     public void initialize() {
-        boolean success = intake_subsystem.IntakeStop();
+        boolean success = intake_subsystem.IntakeSpin();
         if (!success) {
-            intake_subsystem.SpinStop();
+            intake_subsystem.ForwardSpin(-0.5);
         }
     }
 
