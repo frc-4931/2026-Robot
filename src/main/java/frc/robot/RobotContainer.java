@@ -30,11 +30,15 @@ import frc.robot.commands.IntakeBackwardSpinCommand;
 import frc.robot.commands.IntakeStopCommand;
 import frc.robot.commands.LowerIntakeArm;
 import frc.robot.commands.RaiseIntakeArm;
+import frc.robot.commands.RunIntakeCommand;
+import frc.robot.commands.StopIntakeCommand;
 import frc.robot.commands.IntakeGoToPositionCommand;
 import frc.robot.commands.IntakeGoToPositionZeroCommand;
 import frc.robot.commands.IntakeGoToPositionNegPoint8Command;
 
-// import frc.robot.commands.SuperIntakeButton;
+import frc.robot.commands.RunIntakeCommand;
+import frc.robot.commands.StopIntakeCommand;
+import frc.robot.commands.SuperIntakeButton;
 
 import frc.robot.subsystems.swervedrive.SwerveSubsystem;
 import frc.robot.subsystems.ShooterMotorSubsystem;
@@ -76,7 +80,9 @@ public class RobotContainer
 
   // private final Command runIntakeCommand = new ParallelCommandGroup(new LowerIntakeArm(intakeSubsystem), new IntakeSpinCommand(intakeSubsystem));
   // private final Command stowIntakeCommand = new ParallelCommandGroup(new RaiseIntakeArm(intakeSubsystem), new IntakeStopCommand(intakeSubsystem));
-  // private final SuperIntakeButton superIntakeButtonCommandJoystick = new SuperIntakeButton(runIntakeCommand, stowIntakeCommand);
+  private final RunIntakeCommand runIntakeCommand = new RunIntakeCommand(intakeSubsystem);
+  private final StopIntakeCommand stopIntakeCommand = new StopIntakeCommand(intakeSubsystem);
+  private final SuperIntakeButton superIntakeButtonCommandJoystick = new SuperIntakeButton(runIntakeCommand, stopIntakeCommand);
 
   // Establish a Sendable Chooser that will be able to be sent to the SmartDashboard, allowing selection of desired auto
   private final SendableChooser<Command> autoChooser;
@@ -248,13 +254,13 @@ public class RobotContainer
     {
       driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
-      // driverXbox.y().onTrue(superIntakeButtonCommandJoystick);
+      driverXbox.y().onTrue(superIntakeButtonCommandJoystick);
       driverXbox.start().whileTrue(Commands.none());
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       driverXbox.rightBumper().whileTrue(intakeGoToPositionCommand);
-      // redbuttonbox.button(1).onTrue(indexer.BackwardSpin());
-      // redbuttonbox.button(2).whileTrue(indexer.ForwordSpin());
+      redbuttonbox.button(1).onTrue(indexer.BackwardSpin());
+      redbuttonbox.button(2).whileTrue(indexer.ForwordSpin());
       redbuttonbox.button(3).whileTrue(intakeSpinCommand);
       redbuttonbox.button(4).whileTrue(intakeBackwardSpinCommand);
       redbuttonbox.button(5).whileTrue(intakeStopCommand);
@@ -264,10 +270,10 @@ public class RobotContainer
       // redbuttonbox.button(8).whileTrue(intakeSubsystem.RunIntake());
       // Why is this subsystem function not returning a runable? check the subsystem again.
       //redbuttonbox.button(9).whileTrue(intakeSubsystem.IntakeStop());
-      // redbuttonbox.button(10).whileTrue(shooterMotorSubsystem.ForwordSlowSpin(0.5));
-      // otherbuttonbox.button(1).whileTrue(shooterMotorSubsystem.ForwordSlowSpin(-0.5));
-      // otherbuttonbox.button(3).whileTrue(shooterMotorSubsystem.ForwordSlowSpin(.75));
-      // otherbuttonbox.button(2).whileTrue(shooterMotorSubsystem.SpinStop());
+      redbuttonbox.button(10).whileTrue(shooterMotorSubsystem.ForwordSlowSpin(0.5));
+      otherbuttonbox.button(1).whileTrue(shooterMotorSubsystem.ForwordSlowSpin(-0.5));
+      otherbuttonbox.button(3).whileTrue(shooterMotorSubsystem.ForwordSlowSpin(.75));
+      otherbuttonbox.button(2).whileTrue(shooterMotorSubsystem.SpinStop());
      
 
       // buttonBox2.(button5 ).onTrue(algaeArm.ArmStop().andThen(roller.CoralStop()).andThen(climber.ClimbStop()));
