@@ -13,7 +13,7 @@ public class IntakeGoToPositionNegPoint8Command extends Command {
 
     @Override
     public void initialize() {
-        intake_subsystem.goToPositionCommand(-0.8);
+        intake_subsystem.goToPositionCommand(25.5);
     }
 
     @Override

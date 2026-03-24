@@ -165,15 +165,15 @@ public class Robot extends TimedRobot
   public void testInit()
   {
     CommandScheduler.getInstance().cancelAll();
-    DataLogManager.start(); 
-    System.out.println("Logging started for Test Mode.");
+    // DataLogManager.start(); 
+    // System.out.println("Logging started for Test Mode.");
   }
 
   @Override
   public void testExit() {
     // Stop logging when exiting Test Mode to save space/resources
-    DataLogManager.stop();
-    System.out.println("Logging stopped.");
+    // DataLogManager.stop();
+    // System.out.println("Logging stopped.");
   }
 
   /**

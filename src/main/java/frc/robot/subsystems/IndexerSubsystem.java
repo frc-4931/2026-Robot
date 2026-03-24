@@ -67,6 +67,11 @@ public class IndexerSubsystem extends SubsystemBase {
         );
     }
 
+    public Command StopSpin() {
+        return this.runOnce(
+            () -> runDutyCycleMotor(-IndexerConstants.SINGLE_MOTOR_SPEED)// Run reverse while held
+        );
+    }
     // public Command BackwardSlowSpin() {
     //     return this.runEnd(
     //         () -> runDutyCycleMotor(-0.2),

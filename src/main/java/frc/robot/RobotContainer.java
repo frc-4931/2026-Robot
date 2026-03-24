@@ -58,7 +58,7 @@ public class RobotContainer
 {
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  final         CommandXboxController driverXbox = new CommandXboxController(0);
+  final CommandXboxController driverXbox = new CommandXboxController(0);
   final CommandJoystick redbuttonbox= new CommandJoystick(1);
   final CommandJoystick otherbuttonbox= new CommandJoystick(2);
   // The robot's subsystems and commands are defined here...
@@ -270,11 +270,16 @@ public class RobotContainer
     //TODO: ask Eddie how to fix these.
       redbuttonbox.button(8).whileTrue(intakeSubsystem.RunIntake());
       // Why is this subsystem function not returning a runable? check the subsystem again.
-      redbuttonbox.button(9).whileTrue(intakeStopCommand);
+      redbuttonbox.button(9).whileTrue(raiseIntakeCommand);
       redbuttonbox.button(10).whileTrue(shooterMotorSubsystem.ForwordSlowSpin(0.5));
       otherbuttonbox.button(1).whileTrue(shooterMotorSubsystem.ForwordSlowSpin(-0.5));
-      otherbuttonbox.button(3).whileTrue(shooterMotorSubsystem.ForwordSlowSpin(.75));
       otherbuttonbox.button(2).whileTrue(shooterMotorSubsystem.SpinStop());
+      otherbuttonbox.button(3).whileTrue(shooterMotorSubsystem.ForwordSlowSpin(.75));
+      otherbuttonbox.button(4).whileTrue(indexer.StopSpin());
+
+      driverXbox.b().whileTrue(indexer.StopSpin());
+      driverXbox.rightTrigger().whileTrue(intakeSubsystem.goToPositionCommand(0));
+      driverXbox.leftTrigger().whileTrue(intakeSubsystem.goToPositionCommand(25.5));
      
 
       // buttonBox2.(button5 ).onTrue(algaeArm.ArmStop().andThen(roller.CoralStop()).andThen(climber.ClimbStop()));
