@@ -271,10 +271,10 @@ public class RobotContainer
       redbuttonbox.button(8).whileTrue(intakeSubsystem.RunIntake());
       // Why is this subsystem function not returning a runable? check the subsystem again.
       redbuttonbox.button(9).whileTrue(raiseIntakeCommand);
-      redbuttonbox.button(10).whileTrue(shooterMotorSubsystem.ForwordSlowSpin(0.5));
+      redbuttonbox.button(10).whileTrue(shooterMotorSubsystem.ForwordSlowSpin(0.75));
       otherbuttonbox.button(1).whileTrue(shooterMotorSubsystem.ForwordSlowSpin(-0.5));
       otherbuttonbox.button(2).whileTrue(shooterMotorSubsystem.SpinStop());
-      otherbuttonbox.button(3).whileTrue(shooterMotorSubsystem.ForwordSlowSpin(.75));
+      otherbuttonbox.button(3).whileTrue(shooterMotorSubsystem.ForwordSlowSpin(.9));
       otherbuttonbox.button(4).whileTrue(indexer.StopSpin());
 
       driverXbox.b().whileTrue(indexer.StopSpin());
