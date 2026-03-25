@@ -271,9 +271,11 @@ public class RobotContainer
       redbuttonbox.button(5).whileTrue(intakeStopCommand);
       redbuttonbox.button(6).whileTrue(intakeGoToPositionZeroCommand);
       redbuttonbox.button(7).whileTrue(intakeGoToPositionNegPoint8Command);
-    //TODO: ask Eddie how to fix these.
-      redbuttonbox.button(8).whileTrue(intakeSubsystem.RunIntake());
-      // Why is this subsystem function not returning a runable? check the subsystem again.
+      // Button 8: Lower arm and spin intake simultaneously using non-blocking commands
+      redbuttonbox.button(8).whileTrue(new ParallelCommandGroup(
+          intakeSubsystem.goToPositionCommand(26.5),
+          intakeSpinCommand
+      ));
       redbuttonbox.button(9).whileTrue(raiseIntakeCommand);
       redbuttonbox.button(10).whileTrue(shooterMotorSubsystem.SpinAtSpeed(0.75));
       otherbuttonbox.button(1).whileTrue(shooterMotorSubsystem.SpinAtSpeed(-0.5));
