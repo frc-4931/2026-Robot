@@ -221,6 +221,16 @@ public class IntakeSubsystem extends SubsystemBase {
         }
     }
 
+    public boolean IntakeBackwardsSpin() {
+        try {
+            intakeRollerMotor.set(-IntakeConstants.INTAKE_SPEED);
+            // verify motor current output not 0 (best-effort check)
+            return Math.abs(intakeRollerMotor.get()) > 0.01;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
     public boolean IntakeStop() {
         try {
             intakeRollerMotor.stopMotor();

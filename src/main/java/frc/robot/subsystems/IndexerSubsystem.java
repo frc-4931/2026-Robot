@@ -69,7 +69,7 @@ public class IndexerSubsystem extends SubsystemBase {
 
     public Command StopSpin() {
         return this.runOnce(
-            () -> runDutyCycleMotor(-IndexerConstants.SINGLE_MOTOR_SPEED)// Run reverse while held
+            () -> runDutyCycleMotor(0)// Run reverse while held
         );
     }
     // public Command BackwardSlowSpin() {

@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.IntakeSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 
@@ -15,7 +16,7 @@ public class IntakeSpinCommand extends Command {
     public void initialize() {
         boolean success = intake_subsystem.IntakeSpin();
         if (!success) {
-            intake_subsystem.ForwardSpin(0.5);
+            intake_subsystem.ForwardSpin(IntakeConstants.INTAKE_SPEED);
         }
     }
 
