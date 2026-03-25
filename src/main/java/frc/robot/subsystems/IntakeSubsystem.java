@@ -277,4 +277,18 @@ public class IntakeSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("armFollowerMotor", armFollowerMotor.getEncoder().getPosition());
     }
 
+    public Command deployAndKeepSpinning(double targetRotations, double rollerSpeed) {
+        return this.run(() -> {
+            // 1. Continuously update the arm position
+            pidController.setReference(targetRotations, SparkMax.ControlType.kPosition);
+            
+            // 2. Continuously spin the roller
+            intakeRollerMotor.set(rollerSpeed);
+        })
+        // 3. This part defines when the ARM is "done", but we do NOT stop the roller here
+        .until(() -> Math.abs(armLeaderMotor.getEncoder().getPosition() - targetRotations) < 0.1)
+        // 4. Once the arm is in place, transition to a new command that just spins the roller forever
+        .andThen(this.run(() -> intakeRollerMotor.set(rollerSpeed)));
+    }
+
 }

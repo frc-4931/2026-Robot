@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.IntakeBackwardSpinCommand;
 import frc.robot.commands.IntakeGoToPositionCommand;
@@ -152,7 +153,7 @@ public class RobotContainer
     
     //Create the NamedCommands that will be used in PathPlanner
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
-    NamedCommands.registerCommand("indexer_spin", indexer.BackwardSpin());
+    NamedCommands.registerCommand("indexer_spin", indexer.FeedFast());
     NamedCommands.registerCommand("shooter_spin", shooterMotorSubsystem.SpinAtSpeed(.75));
     NamedCommands.registerCommand("lower_arm", intakeSubsystem.goToPositionCommand(26.5));
     NamedCommands.registerCommand("run_intake_roller", intakeBackwardSpinCommand);
@@ -264,7 +265,7 @@ public class RobotContainer
       driverXbox.back().whileTrue(Commands.none());
       driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
       driverXbox.rightBumper().whileTrue(intakeGoToPositionCommand);
-      redbuttonbox.button(1).onTrue(indexer.BackwardSpin());
+      redbuttonbox.button(1).onTrue(indexer.FeedFast());
       redbuttonbox.button(2).whileTrue(indexer.ForwordSpin());
       redbuttonbox.button(3).whileTrue(intakeSpinCommand);
       redbuttonbox.button(4).whileTrue(intakeBackwardSpinCommand);
@@ -272,17 +273,14 @@ public class RobotContainer
       redbuttonbox.button(6).whileTrue(intakeGoToPositionZeroCommand);
       redbuttonbox.button(7).whileTrue(intakeGoToPositionNegPoint8Command);
       // Button 8: Lower arm and spin intake simultaneously using non-blocking commands
-      redbuttonbox.button(8).whileTrue(new ParallelCommandGroup(
-          intakeSubsystem.goToPositionCommand(26.5),
-          intakeSpinCommand
-      ));
+      redbuttonbox.button(8).onTrue(intakeSubsystem.deployAndKeepSpinning(26.5, -IntakeConstants.INTAKE_SPEED).alongWith(indexer.FeedFast()));
       redbuttonbox.button(9).whileTrue(raiseIntakeCommand);
       redbuttonbox.button(10).whileTrue(shooterMotorSubsystem.SpinAtSpeed(0.75));
       otherbuttonbox.button(1).whileTrue(shooterMotorSubsystem.SpinAtSpeed(-0.5));
       otherbuttonbox.button(2).whileTrue(shooterMotorSubsystem.SpinStop());
       otherbuttonbox.button(3).whileTrue(shooterMotorSubsystem.SpinAtSpeed(.9));
       otherbuttonbox.button(4).whileTrue(indexer.StopSpin());
-      otherbuttonbox.button(5).whileTrue(indexer.BackwardSlowSpin());
+      otherbuttonbox.button(5).whileTrue(indexer.FeedSlow());
       
 
       driverXbox.b().whileTrue(indexer.StopSpin());

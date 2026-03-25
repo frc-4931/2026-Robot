@@ -61,13 +61,13 @@ public class IndexerSubsystem extends SubsystemBase {
         );
     }
 
-    public Command BackwardSlowSpin() {
+    public Command FeedSlow() {
         return this.runOnce(
-            () -> runDutyCycleMotor(IndexerConstants.SINGLE_MOTOR_SLOW_SPEED)
+            () -> runDutyCycleMotor(-IndexerConstants.SINGLE_MOTOR_SLOW_SPEED)
         );
     }
 
-    public Command BackwardSpin() {
+    public Command FeedFast() {
         return this.runOnce(
             () -> runDutyCycleMotor(-IndexerConstants.SINGLE_MOTOR_SPEED)
         );
@@ -78,7 +78,7 @@ public class IndexerSubsystem extends SubsystemBase {
             () -> runDutyCycleMotor(0)
         );
     }
-    // public Command BackwardSlowSpin() {
+    // public Command FeedSlow() {
     //     return this.runEnd(
     //         () -> runDutyCycleMotor(-0.2),
     //         () -> runDutyCycleMotor(0.0)
