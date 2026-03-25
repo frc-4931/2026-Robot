@@ -88,12 +88,12 @@ public class ShooterMotorSubsystem extends SubsystemBase {
     @Override
     public void periodic() {}
 
-    public void runSecondMotor(double speed){
+    public void runLeadMotor(double speed){
         leaderMotor.set(speed);
     }
 
     public Command BackwardSlowSpin() {
-        return this.runOnce(() -> { runSecondMotor(-.15);});
+        return this.runOnce(() -> { runLeadMotor(-.15);});
     }
 
     public Command SpinStop() {
@@ -104,8 +104,8 @@ public class ShooterMotorSubsystem extends SubsystemBase {
         leaderMotor.stopMotor(); // Follower will also stop
     }
 
-    public Command ForwordSlowSpin(double speed) {
-        return this.runOnce(() -> { runSecondMotor(speed);});
+    public Command SpinAtSpeed(double speed) {
+        return this.runOnce(() -> { runLeadMotor(speed);});
     }
 
     public void setVelocity(double rpm) {

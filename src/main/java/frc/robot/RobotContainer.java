@@ -152,6 +152,10 @@ public class RobotContainer
     
     //Create the NamedCommands that will be used in PathPlanner
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
+    NamedCommands.registerCommand("indexer_spin", indexer.BackwardSpin());
+    NamedCommands.registerCommand("shooter_spin", shooterMotorSubsystem.SpinAtSpeed(.75));
+    NamedCommands.registerCommand("lower_arm", intakeSubsystem.goToPositionCommand(26.5));
+    NamedCommands.registerCommand("run_intake_roller", intakeBackwardSpinCommand);
 
     //Have the autoChooser pull in all PathPlanner autos as options
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -231,7 +235,7 @@ public class RobotContainer
       driverXbox.b().onTrue(raiseIntakeCommand);
       driverXbox.x().whileTrue(intakeSpinCommand);
       driverXbox.y().whileTrue(intakeStopCommand);
-      driverXbox.rightTrigger().onTrue(shooterMotorSubsystem.ForwordSlowSpin(0.5));
+      driverXbox.rightTrigger().onTrue(shooterMotorSubsystem.SpinAtSpeed(0.5));
       driverXbox.leftTrigger().whileTrue(
           shooterMotorSubsystem.sysIdQuasistatic(Direction.kForward));
 
@@ -271,10 +275,10 @@ public class RobotContainer
       redbuttonbox.button(8).whileTrue(intakeSubsystem.RunIntake());
       // Why is this subsystem function not returning a runable? check the subsystem again.
       redbuttonbox.button(9).whileTrue(raiseIntakeCommand);
-      redbuttonbox.button(10).whileTrue(shooterMotorSubsystem.ForwordSlowSpin(0.75));
-      otherbuttonbox.button(1).whileTrue(shooterMotorSubsystem.ForwordSlowSpin(-0.5));
+      redbuttonbox.button(10).whileTrue(shooterMotorSubsystem.SpinAtSpeed(0.75));
+      otherbuttonbox.button(1).whileTrue(shooterMotorSubsystem.SpinAtSpeed(-0.5));
       otherbuttonbox.button(2).whileTrue(shooterMotorSubsystem.SpinStop());
-      otherbuttonbox.button(3).whileTrue(shooterMotorSubsystem.ForwordSlowSpin(.9));
+      otherbuttonbox.button(3).whileTrue(shooterMotorSubsystem.SpinAtSpeed(.9));
       otherbuttonbox.button(4).whileTrue(indexer.StopSpin());
       otherbuttonbox.button(5).whileTrue(indexer.BackwardSlowSpin());
       
