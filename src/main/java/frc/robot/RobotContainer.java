@@ -276,6 +276,8 @@ public class RobotContainer
       otherbuttonbox.button(2).whileTrue(shooterMotorSubsystem.SpinStop());
       otherbuttonbox.button(3).whileTrue(shooterMotorSubsystem.ForwordSlowSpin(.9));
       otherbuttonbox.button(4).whileTrue(indexer.StopSpin());
+      otherbuttonbox.button(5).whileTrue(indexer.BackwardSlowSpin());
+      
 
       driverXbox.b().whileTrue(indexer.StopSpin());
       driverXbox.rightTrigger().whileTrue(intakeSubsystem.goToPositionCommand(0));

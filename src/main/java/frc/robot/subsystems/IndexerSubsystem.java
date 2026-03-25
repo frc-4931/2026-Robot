@@ -57,19 +57,25 @@ public class IndexerSubsystem extends SubsystemBase {
     // Change your command methods to use runEnd
     public Command ForwordSpin() {
         return this.runOnce(
-            () -> runDutyCycleMotor(IndexerConstants.SINGLE_MOTOR_SPEED) // Run at 50% speed while held
+            () -> runDutyCycleMotor(IndexerConstants.SINGLE_MOTOR_SPEED)
+        );
+    }
+
+    public Command BackwardSlowSpin() {
+        return this.runOnce(
+            () -> runDutyCycleMotor(IndexerConstants.SINGLE_MOTOR_SLOW_SPEED)
         );
     }
 
     public Command BackwardSpin() {
         return this.runOnce(
-            () -> runDutyCycleMotor(-IndexerConstants.SINGLE_MOTOR_SPEED)// Run reverse while held
+            () -> runDutyCycleMotor(-IndexerConstants.SINGLE_MOTOR_SPEED)
         );
     }
 
     public Command StopSpin() {
         return this.runOnce(
-            () -> runDutyCycleMotor(0)// Run reverse while held
+            () -> runDutyCycleMotor(0)
         );
     }
     // public Command BackwardSlowSpin() {
