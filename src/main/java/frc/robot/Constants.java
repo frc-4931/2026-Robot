@@ -77,7 +77,8 @@ public final class Constants
         public static final double INTAKE_ROLLER_VOLTAGE_COMP = 10;
         public static final double ARM_RAISE = 0.0;
         public static final double ARM_LOWER = 25.5;  
-        public static final double INTAKE_SPEED = 0.5; 
+        public static final double INTAKE_SPEED = 0.5;
+         public static final double INTAKE_SLOW_SPEED = 0.3;
   }
 
   public static class IndexerConstants {

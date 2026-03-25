@@ -279,7 +279,7 @@ public class RobotContainer
 
       driverXbox.b().whileTrue(indexer.StopSpin());
       driverXbox.rightTrigger().whileTrue(intakeSubsystem.goToPositionCommand(0));
-      driverXbox.leftTrigger().whileTrue(intakeSubsystem.goToPositionCommand(25.5));
+      driverXbox.leftTrigger().whileTrue(intakeSubsystem.goToPositionCommand(26.5));
      
 
       // buttonBox2.(button5 ).onTrue(algaeArm.ArmStop().andThen(roller.CoralStop()).andThen(climber.ClimbStop()));
