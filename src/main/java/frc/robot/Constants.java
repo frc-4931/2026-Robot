@@ -78,7 +78,6 @@ public final class Constants
         public static final double ARM_RAISE = 0.0;
         public static final double ARM_LOWER = 25.5;  
         public static final double INTAKE_SPEED = 0.5;
-         public static final double INTAKE_SLOW_SPEED = 0.3;
   }
 
   public static class IndexerConstants {
@@ -86,5 +85,6 @@ public final class Constants
     public static final double SINGLE_MOTOR_VOLTAGE_COMP = 10.0;
     public static final int SINGLE_MOTOR_CURRENT_LIMIT = 60;
     public static final double SINGLE_MOTOR_SPEED = 0.5;
+    public static final double SINGLE_MOTOR_SLOW_SPEED = 0.3;
   }
 }
