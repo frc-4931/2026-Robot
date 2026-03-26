@@ -4,14 +4,21 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.ShooterMotorSubsystem;
+
+// import org.littletonrobotics.urcl.URCL;
+
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.net.WebServer;
+import edu.wpi.first.networktables.NetworkTable;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to each mode, as
@@ -45,6 +52,9 @@ public class Robot extends TimedRobot
   @Override
   public void robotInit()
   {
+    DataLogManager.start();
+    // URCL.start();
+
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
@@ -154,8 +164,16 @@ public class Robot extends TimedRobot
   @Override
   public void testInit()
   {
-    // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
+    // DataLogManager.start(); 
+    // System.out.println("Logging started for Test Mode.");
+  }
+
+  @Override
+  public void testExit() {
+    // Stop logging when exiting Test Mode to save space/resources
+    // DataLogManager.stop();
+    // System.out.println("Logging stopped.");
   }
 
   /**

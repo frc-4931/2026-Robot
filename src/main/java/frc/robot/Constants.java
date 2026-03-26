@@ -26,8 +26,8 @@ public final class Constants
   public static final double MAX_SPEED  = Units.feetToMeters(14.5);
   
   // Maximum drive speed of the robot in meters per second.
-  public static final double speedMultiplier = 0.15;
-  public static final double rotationMultiplier = 0.15;
+  public static final double speedMultiplier = 1.00;
+  public static final double rotationMultiplier = 1.00;
   
 //  public static final class AutonConstants
 //  {
@@ -36,10 +36,11 @@ public final class Constants
 //    public static final PIDConstants ANGLE_PID       = new PIDConstants(0.4, 0, 0.01);
 //  }
 
+
   public static final class DrivebaseConstants
   {
 
-    // Hold time on motor brakes when disabled
+    // Hold time on motor brakes when disable     d
     public static final double WHEEL_LOCK_TIME = 10; // seconds
   }
 
@@ -56,5 +57,34 @@ public final class Constants
   public static class VisionOdometry{
     public static final boolean VisionDrive = false;
     public static final boolean MegaTag2 = false;
+  }
+
+  public static final class ShooterMotorConstants {
+        public static final int LEADER_ID = 16;
+        public static final int FOLLOWER_ID = 17;
+        public static final int CURRENT_LIMIT = 60;
+        public static final double VOLTAGE_COMP = 10;
+  }
+
+  public static final class IntakeConstants {
+        public static final int LEADER_ID = 29;
+        public static final int FOLLOWER_ID = 30;
+        public static final int INTAKE_ROLLER_MOTOR_ID = 21;
+        public static final int CURRENT_LIMIT = 20;
+        public static final double VOLTAGE_COMP = 10;
+        public static final double ARM_SETPOSITION = 0;
+        public static final int INTAKE_ROLLER_CURRENT_LIMIT = 40;
+        public static final double INTAKE_ROLLER_VOLTAGE_COMP = 10;
+        public static final double ARM_RAISE = 0.0;
+        public static final double ARM_LOWER = 25.5;  
+        public static final double INTAKE_SPEED = 0.35;
+  }
+
+  public static class IndexerConstants {
+    public static final int SINGLE_MOTOR_ID = 25;
+    public static final double SINGLE_MOTOR_VOLTAGE_COMP = 10.0;
+    public static final int SINGLE_MOTOR_CURRENT_LIMIT = 60;
+    public static final double SINGLE_MOTOR_SPEED = 0.5;
+    public static final double SINGLE_MOTOR_SLOW_SPEED = 0.3;
   }
 }
