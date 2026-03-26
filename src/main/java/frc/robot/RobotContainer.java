@@ -258,13 +258,6 @@ public class RobotContainer
           );
     } else
     {
-      driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
-      driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
-      driverXbox.y().onTrue(superIntakeButtonCommandJoystick);
-      driverXbox.start().whileTrue(Commands.none());
-      driverXbox.back().whileTrue(Commands.none());
-      driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
-      driverXbox.rightBumper().whileTrue(intakeGoToPositionCommand);
       redbuttonbox.button(1).onTrue(indexer.FeedFast());
       redbuttonbox.button(2).whileTrue(indexer.ForwordSpin());
       redbuttonbox.button(3).whileTrue(intakeSpinCommand);
@@ -287,7 +280,15 @@ public class RobotContainer
       otherbuttonbox.button(4).whileTrue(indexer.StopSpin());
       otherbuttonbox.button(5).whileTrue(indexer.FeedSlow());
       
+      driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       driverXbox.b().whileTrue(indexer.StopSpin());
+      driverXbox.x().onTrue(shooterMotorSubsystem.SpinAtSpeed(0.75).alongWith(indexer.FeedFast()));
+      driverXbox.y().onTrue(shooterMotorSubsystem.SpinStop().alongWith(indexer.StopSpin()));
+      driverXbox.start().whileTrue(Commands.none());
+      driverXbox.back().whileTrue(Commands.none());
+      driverXbox.leftBumper().whileTrue(intakeBackwardSpinCommand);
+      driverXbox.rightBumper().whileTrue(intakeStopCommand); 
+      
       driverXbox.rightTrigger().whileTrue(intakeSubsystem.goToPositionCommand(0));
       driverXbox.leftTrigger().whileTrue(intakeSubsystem.goToPositionCommand(26.5));
      
