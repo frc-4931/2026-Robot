@@ -270,19 +270,23 @@ public class RobotContainer
       redbuttonbox.button(3).whileTrue(intakeSpinCommand);
       redbuttonbox.button(4).whileTrue(intakeBackwardSpinCommand);
       redbuttonbox.button(5).whileTrue(intakeStopCommand);
-      redbuttonbox.button(6).whileTrue(intakeGoToPositionZeroCommand);
-      redbuttonbox.button(7).whileTrue(intakeGoToPositionNegPoint8Command);
+      redbuttonbox.button(6).onTrue(intakeGoToPositionZeroCommand);
+      redbuttonbox.button(7).onTrue(intakeSubsystem.getIntakeToggleCommand(26.9, -IntakeConstants.INTAKE_SPEED));
       // Button 8: Lower arm and spin intake simultaneously using non-blocking commands
-      redbuttonbox.button(8).onTrue(intakeSubsystem.deployAndKeepSpinning(26.5, -IntakeConstants.INTAKE_SPEED).alongWith(indexer.FeedFast()));
+    //   redbuttonbox.button(8).onTrue(intakeSubsystem.deployAndKeepSpinning(26.5, -IntakeConstants.INTAKE_SPEED).alongWith(indexer.FeedFast()));
+      // redbuttonbox Button 8: Toggles between Deploy+Spin and Retract+Stop
+        redbuttonbox.button(8).toggleOnTrue(
+            intakeSubsystem.getIntakeToggleCommand(26.5, -IntakeConstants.INTAKE_SPEED)
+        );
+
       redbuttonbox.button(9).whileTrue(raiseIntakeCommand);
-      redbuttonbox.button(10).whileTrue(shooterMotorSubsystem.SpinAtSpeed(0.75));
+      redbuttonbox.button(10).whileTrue(shooterMotorSubsystem.SpinAtSpeed(0.75).alongWith(indexer.FeedFast()));
       otherbuttonbox.button(1).whileTrue(shooterMotorSubsystem.SpinAtSpeed(-0.5));
       otherbuttonbox.button(2).whileTrue(shooterMotorSubsystem.SpinStop());
       otherbuttonbox.button(3).whileTrue(shooterMotorSubsystem.SpinAtSpeed(.9));
       otherbuttonbox.button(4).whileTrue(indexer.StopSpin());
       otherbuttonbox.button(5).whileTrue(indexer.FeedSlow());
       
-
       driverXbox.b().whileTrue(indexer.StopSpin());
       driverXbox.rightTrigger().whileTrue(intakeSubsystem.goToPositionCommand(0));
       driverXbox.leftTrigger().whileTrue(intakeSubsystem.goToPositionCommand(26.5));

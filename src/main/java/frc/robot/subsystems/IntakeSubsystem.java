@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.math.jni.ArmFeedforwardJNI;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.IntakeConstants;
 
@@ -290,5 +291,22 @@ public class IntakeSubsystem extends SubsystemBase {
         // 4. Once the arm is in place, transition to a new command that just spins the roller forever
         .andThen(this.run(() -> intakeRollerMotor.set(rollerSpeed)));
     }
+
+    public Command getIntakeToggleCommand(double targetRotations, double rollerSpeed) {
+        return Commands.startEnd(
+            // START: What to do when toggled ON
+            () -> {
+                pidController.setReference(targetRotations, SparkMax.ControlType.kPosition);
+                intakeRollerMotor.set(rollerSpeed);
+            },
+            // END: What to do when toggled OFF (re-pressed)
+            () -> {
+                pidController.setReference(0, SparkMax.ControlType.kPosition);
+                intakeRollerMotor.stopMotor();
+            },
+            this // Requirement
+        );
+    }
+
 
 }

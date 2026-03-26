@@ -16,7 +16,7 @@ public class IntakeSpinCommand extends Command {
     public void initialize() {
         boolean success = intake_subsystem.IntakeSpin();
         if (!success) {
-            intake_subsystem.ForwardSpin(IntakeConstants.INTAKE_SPEED);
+            intake_subsystem.ForwardSpin(-IntakeConstants.INTAKE_SPEED);
         }
     }
 
