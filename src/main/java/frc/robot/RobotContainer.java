@@ -155,7 +155,7 @@ public class RobotContainer
     NamedCommands.registerCommand("test", Commands.print("I EXIST"));
     NamedCommands.registerCommand("indexer_spin", indexer.FeedFast());
     NamedCommands.registerCommand("shooter_spin", shooterMotorSubsystem.SpinAtSpeed(.75));
-    NamedCommands.registerCommand("lower_arm", intakeSubsystem.goToPositionCommand(26.5));
+    NamedCommands.registerCommand("lower_arm", intakeSubsystem.goToPositionCommand(30));
     NamedCommands.registerCommand("run_intake_roller", intakeBackwardSpinCommand);
 
     //Have the autoChooser pull in all PathPlanner autos as options
@@ -266,29 +266,41 @@ public class RobotContainer
       redbuttonbox.button(6).onTrue(intakeGoToPositionZeroCommand);
       redbuttonbox.button(7).onTrue(intakeSubsystem.getIntakeToggleCommand(26.9, -IntakeConstants.INTAKE_SPEED));
       // Button 8: Lower arm and spin intake simultaneously using non-blocking commands
-    //   redbuttonbox.button(8).onTrue(intakeSubsystem.deployAndKeepSpinning(26.5, -IntakeConstants.INTAKE_SPEED).alongWith(indexer.FeedFast()));
+    //   redbuttonbox.button(8).onTrue(intakeSubsystem.deployAndKeepSpinning(30, -IntakeConstants.INTAKE_SPEED).alongWith(indexer.FeedFast()));
       // redbuttonbox Button 8: Toggles between Deploy+Spin and Retract+Stop
         redbuttonbox.button(8).toggleOnTrue(
-            intakeSubsystem.getIntakeToggleCommand(26.5, -IntakeConstants.INTAKE_SPEED)
+            intakeSubsystem.getIntakeToggleCommand(30, -IntakeConstants.INTAKE_SPEED)
         );
 
       redbuttonbox.button(9).whileTrue(raiseIntakeCommand);
       redbuttonbox.button(10).onTrue(
           Commands.parallel(
-              shooterMotorSubsystem.SpinAtSpeed(0.75),
+              shooterMotorSubsystem.SpinAtSpeed(0.7),
               Commands.waitSeconds(2).andThen(indexer.FeedFast())
           )
       );
       otherbuttonbox.button(1).whileTrue(shooterMotorSubsystem.SpinAtSpeed(-0.5));
       otherbuttonbox.button(2).whileTrue(shooterMotorSubsystem.SpinStop());
-      otherbuttonbox.button(3).whileTrue(shooterMotorSubsystem.SpinAtSpeed(.9));
+      otherbuttonbox.button(3).onTrue(//shooterMotorSubsystem.SpinAtSpeed(.8));
+        // shooterMotorSubsystem.SpinAtSpeed(0.7).alongWith(indexer.FeedFast()));
+                  Commands.parallel(
+              shooterMotorSubsystem.SpinAtSpeed(0.85),
+              Commands.waitSeconds(2).andThen(indexer.FeedFast())
+          )
+      );
       otherbuttonbox.button(4).whileTrue(indexer.StopSpin());
       otherbuttonbox.button(5).whileTrue(indexer.FeedSlow());
-      otherbuttonbox.button(6).onTrue(intakeSubsystem.toggleArmIdleMode());
+      otherbuttonbox.button(8).onTrue(intakeSubsystem.toggleArmIdleMode());
       
       driverXbox.a().onTrue((Commands.runOnce(drivebase::zeroGyro)));
       driverXbox.b().whileTrue(indexer.StopSpin());
-      driverXbox.x().onTrue(shooterMotorSubsystem.SpinAtSpeed(0.75).alongWith(indexer.FeedFast()));
+      driverXbox.x().onTrue(
+        // shooterMotorSubsystem.SpinAtSpeed(0.7).alongWith(indexer.FeedFast()));
+                  Commands.parallel(
+              shooterMotorSubsystem.SpinAtSpeed(0.67),
+              Commands.waitSeconds(2).andThen(indexer.FeedFast())
+          )
+      );
       driverXbox.y().onTrue(shooterMotorSubsystem.SpinStop().alongWith(indexer.StopSpin()));
       driverXbox.start().whileTrue(Commands.none());
       driverXbox.back().whileTrue(Commands.none());
@@ -296,7 +308,7 @@ public class RobotContainer
       driverXbox.rightBumper().whileTrue(intakeStopCommand); 
       
       driverXbox.rightTrigger().whileTrue(intakeSubsystem.goToPositionCommand(0));
-      driverXbox.leftTrigger().whileTrue(intakeSubsystem.goToPositionCommand(26.5));
+      driverXbox.leftTrigger().whileTrue(intakeSubsystem.goToPositionCommand(30));
      
 
       // buttonBox2.(button5 ).onTrue(algaeArm.ArmStop().andThen(roller.CoralStop()).andThen(climber.ClimbStop()));
