@@ -93,7 +93,7 @@ public class ShooterMotorSubsystem extends SubsystemBase {
     }
 
     public Command BackwardSlowSpin() {
-        return this.runOnce(() -> { runLeadMotor(-.15);});
+        return this.runOnce(() -> { runLeadMotor(-.85);});
     }
 
     public Command SpinStop() {

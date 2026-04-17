@@ -15,12 +15,6 @@
           "data": {
             "name": "shooter_spin"
           }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "indexer_spin"
-          }
         }
       ]
     }
